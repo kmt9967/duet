@@ -7,6 +7,16 @@ import { stepDepths } from "@/lib/planner/plan";
 import { useSession } from "@/lib/session/useSession";
 import { useSpeechmatics } from "@/lib/voice/useSpeechmatics";
 
+/**
+ * Touch-target sizing for interactive controls.
+ *
+ * 44px is the accepted minimum for a comfortable tap. The console is dense by
+ * design on a large screen, so the floor applies on small viewports only and
+ * controls tighten up from `sm` upward.
+ */
+const TOUCH =
+  "inline-flex items-center justify-center min-h-11 sm:min-h-0 sm:py-1.5";
+
 const PRESETS = [
   {
     label: "The brief's worked example",
@@ -122,11 +132,11 @@ export default function Home() {
                 onChange={(e) => setTyped(e.target.value)}
                 placeholder="pick up the mug and place it on the right setting"
                 aria-label="Type a command"
-                className="mono min-w-0 flex-1 rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600"
+                className="mono min-h-11 min-w-0 flex-1 rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-2 text-xs text-slate-200 placeholder:text-slate-600 sm:min-h-0"
               />
               <button
                 type="submit"
-                className="shrink-0 rounded-lg bg-sky-500 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-sky-400"
+                className={`shrink-0 rounded-lg bg-sky-500 px-4 text-xs font-semibold text-slate-950 transition hover:bg-sky-400 ${TOUCH}`}
               >
                 Run
               </button>
@@ -137,7 +147,7 @@ export default function Home() {
                 <button
                   key={preset.label}
                   onClick={() => run(preset.text, "preset")}
-                  className="rounded-md border border-slate-700/70 px-2.5 py-1.5 text-[11px] text-slate-400 transition hover:border-sky-500/60 hover:text-sky-300"
+                  className={`rounded-md border border-slate-700/70 px-3 text-[11px] text-slate-400 transition hover:border-sky-500/60 hover:text-sky-300 ${TOUCH}`}
                 >
                   {preset.label}
                 </button>
@@ -244,7 +254,8 @@ function SeedPicker({
       <select
         value={seed}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200"
+        aria-label="Scene randomization seed"
+        className={`rounded-md border border-slate-700 bg-slate-950 px-2 text-xs text-slate-200 ${TOUCH}`}
       >
         {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
           <option key={n} value={n}>
@@ -274,7 +285,7 @@ function Transport({
       <button
         onClick={onToggle}
         disabled={totalMs === 0}
-        className="mono shrink-0 rounded-md border border-slate-700 px-3 py-1.5 text-[11px] text-slate-300 transition enabled:hover:border-sky-500/60 enabled:hover:text-sky-300 disabled:opacity-40"
+        className={`mono shrink-0 rounded-md border border-slate-700 px-4 text-[11px] text-slate-300 transition enabled:hover:border-sky-500/60 enabled:hover:text-sky-300 disabled:opacity-40 ${TOUCH}`}
       >
         {isPlaying ? "PAUSE" : "PLAY"}
       </button>
@@ -306,7 +317,8 @@ function VoicePanel({
         <h2 className="panel-title">Voice — Speechmatics real-time</h2>
         <button
           onClick={() => (listening ? voice.stop() : voice.start())}
-          className={`mono rounded-md px-3 py-1.5 text-[11px] font-semibold transition ${
+          aria-pressed={listening}
+          className={`mono rounded-md px-4 text-[11px] font-semibold transition ${TOUCH} ${
             listening
               ? "bg-rose-500 text-slate-950 hover:bg-rose-400"
               : "bg-emerald-500 text-slate-950 hover:bg-emerald-400"

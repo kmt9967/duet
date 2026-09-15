@@ -85,6 +85,24 @@ Physical AI, Robotics, Voice, Developer Tools
 
 ---
 
+## Speechmatics usage — verified live
+
+```
+Verified against the live API, not mocked. 5/5 utterances transcribed and 5/5
+turned into executable plans. Reproduce with `npm run test:voice`; raw output is
+committed in the repository at evidence/speechmatics/live-test.json.
+
+  "Set the dinner table."            -> 27 steps, 3 hand-offs
+  "Pick up the mug and place it on
+   the right setting."               -> 4 steps
+  "Stop."                            -> control intent, correctly not planned
+
+One run matters more than the clean ones. Speechmatics returned "pick up the
+plate with arm." — the "A" was lost. The parser emitted a pick with no arm
+binding, the planner assigned an arm itself by reachability, and the command
+still executed. That is the designed degradation path, observed live.
+```
+
 ## Speechmatics bonus — why this entry
 
 ```
@@ -138,11 +156,90 @@ We are not claiming the 20 OpenVINO points. Overstating that would be easy and w
 
 | Field | Value |
 |---|---|
-| GitHub repository | `<FILL IN>` |
-| Application URL | `<FILL IN>` |
+| GitHub repository | https://github.com/kmt9967/duet |
+| Application URL | https://duet-alpha-ebon.vercel.app |
 | Demo platform | Vercel |
-| Video presentation | `<FILL IN>` |
-| Slide presentation | `submission/SLIDES.md` |
+| Video presentation | `<RECORD — see DEMO-SCRIPT.md>` |
+| Slide presentation | `<EXPORT — see SLIDES.md>` |
+
+---
+
+## Tagline
+
+```
+Say it. Two arms do it.
+```
+
+Alternate:
+
+```
+Dual-arm Execution from Everyday Talk.
+```
+
+## Innovation
+
+```
+Three things here are unusual for a hackathon build.
+
+Hand-offs are forced by geometry, not scripted. Each place setting is verified at
+scene-generation time to sit inside exactly one arm's reach envelope, so moving
+an object across the table is physically impossible single-armed. The planner
+discovers this by solving IK and inserts a transfer. 28 hand-offs were required
+across 40 benchmark runs and not one is special-cased.
+
+No language model sits in the action path. A model may explain a plan; it never
+chooses one. The same utterance against the same seed yields a byte-identical
+plan, enforced by the test suite. That is what makes a reported success rate
+mean anything.
+
+The reachable workspace is an annulus, not a disc. A top-down grasp spends the
+wrist link vertically, cutting planar reach from 0.32 m to about 0.22 m, and
+targets closer than ~0.14 m exceed the elbow stop. Every position is validated
+by the same IK solver the planner and executor use, so the three can never
+disagree. Sizing the workspace to full extension was our first bug and it cost a
+3% success rate.
+```
+
+## Challenges we ran into
+
+```
+The honest version: the success rate went 3% -> 53% -> 73% -> 98%, and three of
+the four causes were silent failures that produced plausible-looking plans
+missing most of the command.
+
+1. The workspace was sized to the arm's full extension. A top-down grasp cannot
+   use the wrist link horizontally, so almost nothing was actually reachable.
+2. The elbow joint limit rejected near-field targets that needed 1.84 rad on the
+   elbow-down branch, and the grasp model rejected loads a real gripper holds.
+3. Normalisation stripped commas BEFORE clause splitting, collapsing
+   multi-command utterances into one run-on clause and discarding everything
+   after the first verb.
+4. An arm-binding regex matched at the word boundary before "with" and captured
+   the preposition instead of the arm name.
+
+None of these threw an exception. They were found by reading per-seed traces
+rather than aggregate numbers. All four are now regression tests.
+
+Testing against the live Speechmatics API then surfaced two more: a deprecated
+config field, and an ordering flaw where a denied microphone still consumed a
+session because the JWT was minted first.
+```
+
+## Future work
+
+```
+- Camera-to-state perception, so the multi-modal half is addressed on the vision
+  side rather than only in language.
+- Port the scene and kinematics to MuJoCo to gain real contact dynamics and
+  arm-arm collision.
+- Distil the deterministic planner's traces into a learned policy (ACT or
+  SmolVLA via LeRobot) and compare success rates against the symbolic baseline
+  on the same seeds.
+- Quantise the perception stage to OpenVINO IR and benchmark on Intel Core Ultra
+  Series 2/3 hardware.
+- Multilingual command input; Speechmatics supports it and the intent layer is
+  already language-agnostic.
+```
 
 ## Cover image
 
