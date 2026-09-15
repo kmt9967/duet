@@ -1,215 +1,246 @@
-# lablab.ai submission copy — DUET
+# lablab.ai submission — FINAL field-by-field copy
 
-Field-ready text for the lablab submission form. Track: **Bimanual VLA Manipulation with Multi-Modal Reasoning** (online). Also entered for the **Best Use of Speechmatics** bonus award, which is open to every track.
+Paste each block verbatim. Verified against production on 2026-09-15.
 
----
-
-## Project title
-
-```
-DUET — Dual-arm Execution from Everyday Talk
-```
-
-## Short description
-
-```
-Say a dinner-table instruction and two simulated SO-101 arms work out how to do
-it — chaining preconditions, assigning arms by real inverse kinematics, and
-handing objects between themselves when neither arm can reach alone. 98% success
-across 10 randomized seeds.
-```
-
-## Long description
-
-```
-DUET turns a spoken sentence into coordinated two-arm manipulation.
-
-Speak "open the top drawer, pick up the plate with arm A, place it on the table,
-pick up the mug with arm B, pour water into the mug with arm A" — the worked
-example from Intel's challenge brief — and the system transcribes it with
-Speechmatics real-time, parses it into structured intents, plans a dependency
-graph of arm actions, and executes it with both arms running concurrently
-wherever the graph allows.
-
-Three things make that harder than it sounds, and DUET handles all three.
-
-PRECONDITIONS. The cutlery starts inside a closed drawer. Nothing can be picked
-from it until the drawer is opened — and it is opened exactly once, however many
-later instructions depend on it.
-
-HAND-OFFS THAT ARE FORCED, NOT SCRIPTED. Each place setting is verified at
-scene-generation time to sit inside exactly one arm's reach envelope. When the
-arm holding an object cannot reach the destination and the other one can, the
-planner inserts a give/take transfer through the zone where the two envelopes
-overlap. Across the benchmark, 28 hand-offs were required in 40 runs. None of
-them are special-cased.
-
-ROBUSTNESS. Object placement, mass, friction, shape, drawer position, lighting
-and background are all randomized per seed. Grasps can genuinely fail: grip
-stability is computed from Coulomb friction against load, so a heavy
-low-friction bottle is marginal and sometimes slips. Failures propagate — the
-dependent steps are skipped, not silently executed.
-
-The planner is deterministic and no language model sits in the action path. A
-model can explain a plan; it never chooses one. That is what makes the benchmark
-meaningful: the same utterance against the same seed yields a byte-identical
-plan every time, and the test suite enforces it.
-
-Reachability is decided by solving inverse kinematics, never by a radius test.
-This matters more than it sounds — the usable workspace is an annulus, not a
-disc, because a target too close to the base needs more elbow flexion than the
-servo allows. Getting this wrong was the cause of an early 3% success rate.
-
-Measured result: 39 of 40 seed-task combinations succeed (98%), where "success"
-requires the command to plan with no errors, every step to execute, AND the
-world to actually end in the requested state. The single failure is retained
-deliberately: on one seed the mug lands where neither arm can achieve the
-pouring pose within its elbow limit, and the system says exactly that.
-
-Runs entirely in the browser. npm install && npm run dev — no Python, no Docker,
-no model download.
-```
-
-## Technology tags
-
-```
-TypeScript, Next.js, React, Speechmatics, Robotics, Bimanual Manipulation,
-Inverse Kinematics, Task Planning, Simulation, Voice AI, Physical AI
-```
-
-## Category tags
-
-```
-Physical AI, Robotics, Voice, Developer Tools
-```
-
----
-
-## Speechmatics usage — verified live
-
-```
-Verified against the live API, not mocked. 5/5 utterances transcribed and 5/5
-turned into executable plans. Reproduce with `npm run test:voice`; raw output is
-committed in the repository at evidence/speechmatics/live-test.json.
-
-  "Set the dinner table."            -> 27 steps, 3 hand-offs
-  "Pick up the mug and place it on
-   the right setting."               -> 4 steps
-  "Stop."                            -> control intent, correctly not planned
-
-One run matters more than the clean ones. Speechmatics returned "pick up the
-plate with arm." — the "A" was lost. The parser emitted a pick with no arm
-binding, the planner assigned an arm itself by reachability, and the command
-still executed. That is the designed degradation path, observed live.
-```
-
-## Speechmatics bonus — why this entry
-
-```
-Speechmatics is the operator interface for a physical task here, not a
-transcription feature bolted on. Because the transcript gates a robot action,
-three things follow directly.
-
-Partials caption, finals execute. Partial transcripts drive the live caption so
-the operator can see they are being heard, but only a settled transcript is
-parsed and executed. A half-recognised phrase never moves an arm.
-
-The parser is built for ASR output, not prose. Real transcripts arrive with no
-punctuation, with fillers, and with homophones. DUET recovers clause boundaries
-from command-verb onsets — so "open the drawer pick up the plate place it down"
-splits correctly with zero punctuation — strips fillers, and maps "arm be" and
-"arm eight" to arm B and arm A. Two real bugs were found and fixed here: comma
-stripping that silently collapsed multi-command utterances, and a regex that
-captured the preposition "with" instead of the arm name. Both are now regression
-tests.
-
-Low delay is functional. max_delay is 1.2s because the operator is waiting on a
-physical outcome.
-
-Credentials are handled properly. The API key never reaches the browser — a
-server route mints a 120-second JWT, rate-limited to 60 per hour so a reconnect
-loop cannot drain free-tier credits. Every failure path degrades to typed input
-and says why, and typed commands take the identical path through parser, planner
-and executor, so the fallback is not a different system.
-```
-
----
-
-## Challenge-rubric self-assessment
-
-Stated plainly rather than implied. The Intel rubric is 100 points.
-
-| Criterion | Pts | What DUET does |
-|---|---|---|
-| End-to-end task completion & bimanual manipulation | 30 | Full pipeline, 98% across 10 seeds, 28 forced hand-offs, 2× realised parallelism. **Not MuJoCo** — a purpose-built deterministic simulator. |
-| VLA / multi-modal reasoning | 20 | Natural-language instruction → grounded intents → multi-step plan with preconditions and context across clauses. Reasoning is symbolic, **not a learned VLA policy**, and perception reads scene state rather than pixels. |
-| Robustness & generalization | 15 | Seeded randomization of placement, mass, friction, shape, lighting, background. Results reported across 10 seeds including the failure. |
-| OpenVINO & Intel Core Ultra optimization | 20 | **Not addressed.** No Core Ultra hardware was available; the dev machine is a 2012 i5-3470 with no NPU. Nothing is claimed. |
-| Technical quality & reproducibility | 10 | Deterministic by construction, 29 tests, one-command setup, committed evidence, benchmark reproducible on any machine. |
-| Innovation & technical demonstration | 5 | Hand-offs emerge from verified geometry rather than scripting; zero-install browser demo a judge can run instantly. |
-
-We are not claiming the 20 OpenVINO points. Overstating that would be easy and wrong.
-
----
-
-## Links
-
-| Field | Value |
+| | |
 |---|---|
-| GitHub repository | https://github.com/kmt9967/duet |
-| Application URL | https://duet-alpha-ebon.vercel.app |
-| Demo platform | Vercel |
-| Video presentation | `<RECORD — see DEMO-SCRIPT.md>` |
-| Slide presentation | `<EXPORT — see SLIDES.md>` |
+| **Track** | Bimanual VLA Manipulation with Multi-Modal Reasoning *(online)* |
+| **Bonus** | Best Use of Speechmatics — *"OPEN TO EVERY TRACK", "Onsite + Online", "No assignment needed"* |
+| **Team** | Teqprotech |
+| **Deadline** | Sep 16, 11:30 PM PST |
+
+> Rule that governs this: *"Each project can be submitted to one track only."*
+> The Speechmatics award is a **bonus**, not a track — it layers on top of the
+> single track selected. No separate entry, no conflict.
 
 ---
 
-## Tagline
+## 1. Project name
+
+```
+DUET
+```
+
+## 2. Tagline
 
 ```
 Say it. Two arms do it.
 ```
 
-Alternate:
+## 3. Short description
 
 ```
-Dual-arm Execution from Everyday Talk.
+Say a dinner-table instruction and two simulated SO-101 arms work out how to do
+it — chaining preconditions, assigning arms by real inverse kinematics, and
+handing objects between themselves when neither arm can reach alone. One spoken
+sentence produces exactly one command. 98% success across 10 randomized seeds.
 ```
 
-## Innovation
+## 4. Full description
 
 ```
-Three things here are unusual for a hackathon build.
+DUET turns a spoken sentence into coordinated two-arm manipulation.
 
-Hand-offs are forced by geometry, not scripted. Each place setting is verified at
+Say "Set the dinner table." and the system transcribes it live with
+Speechmatics, parses it into structured intents, plans a dependency graph of arm
+actions, and executes it with both arms running concurrently wherever the graph
+allows: 27 steps, 3 hand-offs, 2x parallelism.
+
+Three things make that harder than it sounds.
+
+PRECONDITIONS. The cutlery starts inside a closed drawer. Nothing can be picked
+from it until the drawer is opened — and it is opened exactly once, however many
+later instructions depend on it. Nothing tells the planner to do this; it falls
+out of the dependency graph.
+
+HAND-OFFS THAT ARE FORCED, NOT SCRIPTED. Each place setting is verified at
 scene-generation time to sit inside exactly one arm's reach envelope, so moving
-an object across the table is physically impossible single-armed. The planner
-discovers this by solving IK and inserts a transfer. 28 hand-offs were required
-across 40 benchmark runs and not one is special-cased.
-
-No language model sits in the action path. A model may explain a plan; it never
-chooses one. The same utterance against the same seed yields a byte-identical
-plan, enforced by the test suite. That is what makes a reported success rate
-mean anything.
+an object across the table is physically impossible single-armed. When the arm
+holding an object cannot reach the destination and the other one can, the
+planner inserts a give/take transfer through the zone where the two envelopes
+overlap. Across the benchmark, 28 hand-offs were required in 40 runs. Not one is
+special-cased.
 
 The reachable workspace is an annulus, not a disc. A top-down grasp spends the
 wrist link vertically, cutting planar reach from 0.32 m to about 0.22 m, and
-targets closer than ~0.14 m exceed the elbow stop. Every position is validated
-by the same IK solver the planner and executor use, so the three can never
-disagree. Sizing the workspace to full extension was our first bug and it cost a
-3% success rate.
+targets closer than ~0.14 m exceed the elbow stop. Reachability is decided by
+solving IK — the scene generator, planner and executor all call the same solver,
+so they cannot disagree.
+
+ROBUSTNESS. Object placement, mass, friction, shape, drawer position, lighting
+and background are randomized per seed. Grasps can genuinely fail: grip
+stability is computed from Coulomb friction against load, so a heavy
+low-friction bottle is marginal and sometimes slips. Failures propagate — the
+dependent steps are skipped, not silently executed.
+
+The planner is deterministic and no language model sits in the action path. A
+model may explain a plan; it never chooses one. The same utterance against the
+same seed yields a byte-identical plan, and the test suite enforces it. That is
+what makes a reported success rate mean anything.
+
+Measured: 39 of 40 seed-task combinations succeed (98%), where success requires
+the command to plan with no errors, every step to execute, AND the world to end
+in the requested state. The single failure is retained deliberately — on one
+seed the mug lands where neither arm can reach the pouring pose within its elbow
+limit, and the system says exactly that.
+
+Runs entirely in the browser. npm install && npm run dev — no Python, no Docker,
+no model download. A judge can press a preset and see it work in under a minute,
+with no microphone required.
 ```
 
-## Challenges we ran into
+## 5. Problem
 
 ```
-The honest version: the success rate went 3% -> 53% -> 73% -> 98%, and three of
-the four causes were silent failures that produced plausible-looking plans
-missing most of the command.
+Natural-language robot commands are usually demoed with one arm, one object, and
+a fixed scene. Real bimanual manipulation is harder in ways a scripted demo
+hides: some instructions have preconditions you must discover, some targets are
+physically unreachable by the arm currently holding the object, and the scene is
+never the same twice. A system that only works when the plate happens to be
+within reach has not solved anything.
+```
+
+## 6. Solution
+
+```
+A voice-first pipeline where every stage is inspectable:
+
+  speech -> Speechmatics real-time -> segments -> utterance -> parser
+        -> deterministic planner -> dependency graph -> executor
+
+The planner emits a graph, not a list, so coordination is data rather than
+imperative code: steps at equal depth run on both arms at once, and where an arm
+waits you can see which edge is making it wait. Hand-offs are inserted because
+IK says the holding arm cannot finish the job — not because a demo path calls
+for one.
+```
+
+## 7. Technology
+
+```
+TypeScript, Next.js 16, React 19, Tailwind CSS 4, Canvas 2D, Speechmatics
+Real-Time SDK, Node test runner, Vercel.
+
+Closed-form 5-DOF SO-101 inverse kinematics with real joint limits. Seeded
+mulberry32 domain randomization. Coulomb-friction grasp model. Dependency-graph
+planner with topological scheduling.
+
+No Python, no Docker, no build-time model download.
+```
+
+## 8. Innovation
+
+```
+Hand-offs are forced by geometry, not scripted. Each place setting is verified at
+generation time to sit inside exactly one arm's reach envelope, so crossing the
+table is physically impossible single-armed. 28 hand-offs across 40 runs, none
+special-cased.
+
+No language model in the action path. A model may explain a plan; it never
+chooses one. Same utterance, same seed, byte-identical plan — enforced by tests.
+That is what makes the benchmark meaningful.
+
+The workspace is an annulus, not a disc, and every component agrees on that
+because they all call the same IK solver. Sizing it to full arm extension was our
+first bug and cost a 3% success rate.
+```
+
+## 9. Speechmatics usage
+
+```
+Speechmatics is the operator interface for a physical task, not a transcription
+feature bolted on. Because the transcript gates a robot action, three things
+follow.
+
+ADDTRANSCRIPT IS A SEGMENT, NOT A SENTENCE. This is the detail that matters, and
+getting it wrong caused a production bug we found and fixed. Speaking "Set the
+dinner table." emits four separate AddTranscript messages — "Set", "the",
+"dinner", "table." Dispatching on each one sent four fragments through the
+planner, all rejected, flooding the command log, while the sentence the operator
+actually spoke never ran. Segments are now buffered and released as one command
+on the server's EndOfUtterance boundary, enabled via
+conversation_config.end_of_utterance_silence_trigger, with a client-side silence
+timeout as fallback. Duplicate boundaries are safe by construction: the buffer
+drains on the first one, so a repeat finds nothing — while genuinely repeating a
+phrase still produces two commands.
+
+Live-verified, not mocked: 6/6 utterances transcribed, EndOfUtterance received
+for each, exactly 1 command emitted for each. Reproduce with `npm run test:voice`;
+raw output is committed at evidence/speechmatics/live-test.json.
+
+PARTIALS CAPTION, UTTERANCES EXECUTE. Partial transcripts drive the live caption
+so the operator can see they are being heard, but nothing is parsed until a whole
+sentence is assembled. A half-heard phrase never moves an arm.
+
+BUILT FOR ASR OUTPUT, NOT PROSE. Real transcripts arrive with no punctuation,
+with fillers, and with homophones. DUET recovers clause boundaries from
+command-verb onsets — so "open the drawer pick up the plate place it down"
+splits correctly with zero punctuation — strips fillers, and maps "arm be" and
+"arm eight" to arm B and arm A. In live testing Speechmatics returned "pick up
+the plate with arm", dropping the "A"; the parser emitted a pick with no arm
+binding and the planner assigned one itself by reachability. The command still
+executed. That is the designed degradation path, observed live.
+
+CREDENTIALS AND COST. The API key never reaches the browser — a server route
+mints a 120-second JWT, rate-limited to 60 per hour so a reconnect loop cannot
+drain free-tier credits. The microphone is requested BEFORE a token is minted,
+so a refused permission prompt costs nothing. Verified absent from the
+production HTML and all client bundles. Every failure path degrades to typed
+input and says why, on the identical code path.
+```
+
+## 10. Bimanual reasoning
+
+```
+Intents become a dependency graph of primitive arm actions. Three responsibilities
+live in the planner:
+
+Precondition chaining — an object inside a closed drawer implies opening that
+drawer first, once, however many intents depend on it.
+
+Arm assignment by real IK — every candidate grasp is tested with the actual
+solver against joint limits, not a bounding sphere, and checked at the approach
+angle the step will really use. A pour executes at -45 degrees, and checking it
+top-down would let the planner commit to a step the executor then refuses.
+
+Hand-off insertion — when the holding arm cannot reach the destination and the
+other can, a give/take pair is emitted through the shared zone.
+
+Two invariants the executor depends on and the tests enforce: an arm is never
+scheduled to do two things at once, and a failed step marks its dependents
+skipped rather than running them anyway.
+```
+
+## 11. Robustness
+
+```
+Evaluated across 10 randomized seeds and 4 tasks with no per-seed tuning: 39/40,
+98%.
+
+Randomized per seed: object placement, mass (x0.8-1.3), friction (x0.7-1.35),
+per-axis shape jitter (+/-12%), drawer position, placemat positions, lighting,
+background.
+
+Success requires all three: the command planned with zero errors, every emitted
+step executed without failure, and every goal predicate satisfied on the final
+world state. Scoring on goal predicates alone would let a plan that silently
+dropped half the command pass whenever the scene happened to start near the
+goal — that exact false pass appeared during development and is why the first
+two criteria were added.
+
+The single failure is kept. Tuning it away would make the 98% meaningless.
+```
+
+## 12. Challenges we ran into
+
+```
+The success rate went 3% -> 53% -> 73% -> 98%, and three of the four causes were
+silent failures producing plausible-looking plans that were missing most of the
+command.
 
 1. The workspace was sized to the arm's full extension. A top-down grasp cannot
    use the wrist link horizontally, so almost nothing was actually reachable.
-2. The elbow joint limit rejected near-field targets that needed 1.84 rad on the
+2. The elbow joint limit rejected near-field targets needing 1.84 rad on the
    elbow-down branch, and the grasp model rejected loads a real gripper holds.
 3. Normalisation stripped commas BEFORE clause splitting, collapsing
    multi-command utterances into one run-on clause and discarding everything
@@ -217,32 +248,70 @@ missing most of the command.
 4. An arm-binding regex matched at the word boundary before "with" and captured
    the preposition instead of the arm name.
 
-None of these threw an exception. They were found by reading per-seed traces
-rather than aggregate numbers. All four are now regression tests.
+None threw an exception. They were found by reading per-seed traces rather than
+aggregate numbers. All four are now regression tests.
 
-Testing against the live Speechmatics API then surfaced two more: a deprecated
-config field, and an ordering flaw where a denied microphone still consumed a
-session because the JWT was minted first.
+The hardest one came last and only appeared in production: AddTranscript is an
+incremental segment, not a sentence, so every spoken command was being executed
+as fragments. Our own Node harness had hidden it by joining all segments and
+parsing once at the end — testing a code path the browser never used. The fix
+was to buffer segments and wait for a real end-of-utterance boundary, and the
+harness now mirrors the browser exactly.
 ```
 
-## Future work
+## 13. Future work
 
 ```
 - Camera-to-state perception, so the multi-modal half is addressed on the vision
   side rather than only in language.
-- Port the scene and kinematics to MuJoCo to gain real contact dynamics and
-  arm-arm collision.
+- Port the scene and kinematics to MuJoCo for real contact dynamics and arm-arm
+  collision.
 - Distil the deterministic planner's traces into a learned policy (ACT or
-  SmolVLA via LeRobot) and compare success rates against the symbolic baseline
-  on the same seeds.
+  SmolVLA via LeRobot) and compare against the symbolic baseline on the same
+  seeds.
 - Quantise the perception stage to OpenVINO IR and benchmark on Intel Core Ultra
   Series 2/3 hardware.
 - Multilingual command input; Speechmatics supports it and the intent layer is
   already language-agnostic.
 ```
 
-## Cover image
+## 14. Technology tags
 
-Use `evidence/screenshots/01-command-center.png` — the console mid-execution with
-both arms articulated, the plan's parallel phases visible, and the hand-off
-annotation on screen.
+```
+TypeScript, Next.js, React, Speechmatics, Robotics, Bimanual Manipulation,
+Inverse Kinematics, Task Planning, Simulation, Voice AI, Physical AI
+```
+
+## 15. Category tags
+
+```
+Physical AI, Robotics, Voice, Developer Tools
+```
+
+---
+
+## 16. Links
+
+| Field | Value |
+|---|---|
+| Public GitHub repository | `https://github.com/kmt9967/duet` |
+| Application URL | `https://duet-alpha-ebon.vercel.app` |
+| Demo application platform | Vercel |
+| Video presentation | `<PASTE YOUTUBE URL>` |
+| Slide presentation | `<PASTE SLIDES PDF/LINK>` |
+| Cover image | `evidence/final-ui/00-cover.png` |
+
+---
+
+## 17. Rubric self-assessment (for your own reference — do not paste)
+
+| Criterion | Pts | Position |
+|---|---|---|
+| End-to-end task completion & bimanual manipulation | 30 | Strong — 98%/10 seeds, 28 forced hand-offs, 2× parallelism. **Not MuJoCo.** |
+| VLA / multi-modal reasoning | 20 | Partial — language side strong, **no learned policy, perception not from pixels**. |
+| Robustness & generalization | 15 | Strong — 6 randomization axes, results across 10 seeds including the failure. |
+| OpenVINO & Intel Core Ultra optimization | 20 | **Not claimed.** No such hardware. |
+| Technical quality & reproducibility | 10 | Strong — deterministic, 53 tests, one-command setup, committed evidence. |
+| Innovation & technical demonstration | 5 | Strong — geometry-forced hand-offs, zero-install live demo. |
+
+Do not overstate the 20 unclaimed points. Judges will check.
