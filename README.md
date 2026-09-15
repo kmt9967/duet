@@ -4,10 +4,16 @@
 
 Built for the **AI Infra Summit Hackathon 2026** — Intel's online *Bimanual VLA Manipulation with Multi-Modal Reasoning* challenge, with **Speechmatics** real-time transcription as the operator interface.
 
+### ▶ [Live demo — duet-alpha-ebon.vercel.app](https://duet-alpha-ebon.vercel.app)
+
+No install, no sign-up, no microphone required. Press a preset and watch two arms plan and execute.
+
 ```bash
+git clone https://github.com/kmt9967/duet && cd duet
 npm install
-npm run dev      # http://localhost:3000
-npm run verify   # typecheck + lint + 29 tests + benchmark
+npm run dev        # http://localhost:3000
+npm run verify     # typecheck + lint + 29 tests + benchmark
+npm run test:voice # live Speechmatics end-to-end (needs a key)
 ```
 
 ---
@@ -82,20 +88,51 @@ Full detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Voice
 
-Real Speechmatics real-time transcription over WebSocket. The API key stays server-side — the browser receives only a short-lived JWT minted by `/api/speechmatics-token`, with a per-hour quota guard so a reconnect loop cannot drain free-tier credits.
+Real Speechmatics real-time transcription over WebSocket, **verified live**: 5/5 synthesised utterances transcribed and 5/5 turned into executable plans. Reproduce with `npm run test:voice`; raw output is committed at [`evidence/speechmatics/live-test.json`](evidence/speechmatics/live-test.json).
+
+| Spoken | Returned | Result |
+|---|---|---|
+| "Set the dinner table." | *Set the dinner table.* | 27 steps, 3 hand-offs |
+| "Pick up the mug and place it on the right setting." | *Pick up the mug and place it on the right setting.* | 4 steps |
+| "Stop." | *Stop.* | control intent — correctly **not** planned |
+
+One run is more informative than the clean ones: Speechmatics returned *"pick up the plate with arm."*, losing the "A". The parser emitted `pick` without an arm binding and the planner assigned one itself by reachability. The command still executed. That is the designed degradation, not a lucky escape.
+
+The API key stays server-side — the browser receives only a 120-second JWT from `/api/speechmatics-token`, with a 60-per-hour quota guard so a reconnect loop cannot drain free-tier credits. **The microphone is requested before a token is minted**, so a refused permission prompt costs nothing.
 
 Every failure degrades to typed input rather than breaking: missing key, denied microphone, quota hit, or dropped socket each surface as a message and leave the app fully usable. **Typed commands take the identical path** through parser, planner and executor — the fallback is not a different system.
 
-Setup and detail: [docs/SPEECHMATICS-INTEGRATION.md](docs/SPEECHMATICS-INTEGRATION.md).
+Detail, including two defects the live test exposed: [docs/SPEECHMATICS-INTEGRATION.md](docs/SPEECHMATICS-INTEGRATION.md).
+
+To enable voice locally:
 
 ```bash
 cp .env.example .env.local
 # add SPEECHMATICS_API_KEY, then restart the dev server
 ```
 
-## Honest limitations
+## Demo commands
 
-This is stated plainly because the challenge rubric rewards reproducibility and the demo should not be mistaken for something it isn't.
+Say these, or type them — identical code path either way.
+
+```
+set the dinner table
+pick up the mug and place it on the right setting
+open the top drawer, pick up the plate with arm A, place it on the table
+place the fork on the right setting
+hand the plate to arm B
+pour water into the mug
+stop
+reset
+```
+
+The parser is built for ASR output, so it also copes with no punctuation, fillers, and homophones — `"um okay so pick up the cup with arm be"` resolves to a pick on the mug with arm B.
+
+## Scope
+
+DUET focuses on **multi-modal reasoning, voice interaction, bimanual task planning, deterministic safety, and reproducible simulation** within the constraints of remote-only hardware. Those are the parts of the challenge it addresses well, and the numbers backing them are all measured.
+
+The scope it does **not** cover is stated just as plainly, because the rubric rewards reproducibility and a judge should not have to guess:
 
 - **No OpenVINO, no Intel Core Ultra results.** The rubric allocates 20/100 points to optimized inference on Core Ultra Series 2/3. The development machine is a 2012 Core i5-3470 with no NPU, so there is nothing to report and nothing is claimed. No benchmark in this repo was produced on Intel Core Ultra hardware.
 - **Not MuJoCo.** The brief names MuJoCo as the primary simulator. This is a purpose-built deterministic simulator with analytic SO-101 kinematics, a Coulomb-friction grasp model, and seeded domain randomization. It runs in any browser with zero install — which is a real advantage for a judge, but it is not the named simulator and is not a physics engine. Contact dynamics, collision response between objects, and arm-arm collision are not modelled.
@@ -120,9 +157,18 @@ Tests cover ASR-shaped parser input, IK round-tripping (`FK(IK(p)) == p`), plan 
 
 ## Tech
 
-TypeScript · Next.js 16 · React 19 · Tailwind CSS 4 · Canvas 2D · Speechmatics real-time SDK · Node test runner
+TypeScript · Next.js 16 · React 19 · Tailwind CSS 4 · Canvas 2D · Speechmatics real-time SDK · Node test runner · Vercel
 
 No Python, no Docker, no build-time model download. `npm install && npm run dev` is the whole setup.
+
+## Links
+
+| | |
+|---|---|
+| Live demo | <https://duet-alpha-ebon.vercel.app> |
+| Repository | <https://github.com/kmt9967/duet> |
+| Track | Intel — Bimanual VLA Manipulation with Multi-Modal Reasoning (online) |
+| Bonus | Best Use of Speechmatics |
 
 ## Repository map
 

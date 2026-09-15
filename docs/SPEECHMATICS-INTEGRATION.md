@@ -70,6 +70,65 @@ Every failure path leaves the application fully usable, and says why in plain la
 
 **The typed fallback is not a separate system.** A typed command takes the identical path through parser → planner → executor. A demo without a microphone is still a demo of the real pipeline.
 
+## Live verification (2026-09-15)
+
+Tested against the **live** Speechmatics real-time API, not a mock. Reproduce with:
+
+```bash
+npm run test:voice
+```
+
+The harness synthesises speech with Windows SAPI, streams it as 16 kHz mono PCM
+over the real WebSocket, and then pushes the resulting **final** transcript
+through the actual parser, planner and executor. Raw output is committed at
+[`evidence/speechmatics/live-test.json`](../evidence/speechmatics/live-test.json),
+with the source audio in `evidence/speechmatics/audio/`.
+
+| Utterance sent | Transcript returned | Intents | Plan |
+|---|---|---|---|
+| "Set the dinner table." | *Set the dinner table.* | `set_table` | 27 steps, 3 hand-offs, 27 executed |
+| "Pick up the mug and place it on the right setting." | *Pick up the mug and place it on the right setting.* | `pick, place` | 4 steps, 4 executed |
+| "Open the top drawer, pick up the plate with arm A, place it on the table." | *Open the top drawer. Pick up the plate with arm. Place it on the table.* | `open_drawer, pick, place` | 6 steps, 6 executed |
+| "Stop." | *Stop.* | `stop` | 0 steps — control intent, correctly not planned |
+| "Place the fork on the right setting." | *Place the fork on the right setting.* | `place` | 8 steps, 1 hand-off, 8 executed |
+
+**Transcribed 5/5. Actionable 5/5.** First partial arrived at 1488–1913 ms across
+the five runs.
+
+### What the third row shows
+
+Speechmatics returned *"pick up the plate with arm."* — the "A" was lost. This is
+exactly the class of degradation the design anticipates: the arm binding simply
+does not appear, the parser emits `pick` without an arm, and the planner assigns
+an arm itself by reachability. The command still executed correctly. Nothing
+crashed and nothing was silently dropped.
+
+It also shows why finals, not partials, drive actions.
+
+### Two defects this test found
+
+Both are fixed and both were only visible against the live API:
+
+1. **`operating_point` is deprecated.** The server responded
+   `transcription_config.operating_point is deprecated. Use
+   transcription_config.model instead.` Now sends `model: "enhanced"`.
+2. **A denied microphone still cost a session.** The original order minted a JWT
+   and opened the socket *before* requesting the microphone, so every refused
+   permission prompt consumed a Speechmatics session. The microphone is now
+   acquired first, and a refusal costs nothing.
+
+### Not yet verified
+
+Browser microphone capture end to end. The automated environment cannot grant a
+microphone permission prompt — a programmatic click carries no user activation,
+so `getUserMedia` is refused. What *was* verified in the browser is the full
+failure path: the app degraded to
+*"Could not open the microphone. Typed commands still work."* and stayed usable.
+
+The transport, authentication, transcription, partial/final handling and
+parser-to-planner chain are all confirmed live by the test above; only the final
+hop from a physical microphone into that same PCM stream is untested.
+
 ## Measured latency
 
 The hook records the interval from the first audio frame sent to the first transcript received and displays it in the voice panel:

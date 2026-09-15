@@ -13,7 +13,7 @@
  * arms sit at the bottom of the frame and the table extends upward.
  */
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { jointPositions } from "@/lib/core/kinematics";
 import { ARM_BASES } from "@/lib/core/scene";
@@ -53,7 +53,7 @@ export type WorkspaceCanvasProps = {
 export function WorkspaceCanvas({ scene, active, focusArm }: WorkspaceCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
+  const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -63,13 +63,20 @@ export function WorkspaceCanvas({ scene, active, focusArm }: WorkspaceCanvasProp
     if (!parent) return;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const cssWidth = parent.clientWidth;
-    const cssHeight = Math.max(320, Math.round(cssWidth * 0.62));
 
+    // Let CSS own the width. Setting an explicit pixel width here would make the
+    // canvas participate in layout at its *previous* size, holding the container
+    // open and yielding a stale measurement on the way down — the canvas would
+    // then never shrink and would overflow the viewport on a narrow screen.
+    canvas.style.width = "100%";
+    // Reading clientWidth flushes layout, so this is the post-CSS width.
+    const cssWidth = canvas.clientWidth || parent.clientWidth;
+    const cssHeight = Math.max(280, Math.round(cssWidth * 0.62));
+
+    canvas.style.height = `${cssHeight}px`;
+    // Assigning width/height resets the drawing state, so scale afterwards.
     canvas.width = Math.round(cssWidth * dpr);
     canvas.height = Math.round(cssHeight * dpr);
-    canvas.style.width = `${cssWidth}px`;
-    canvas.style.height = `${cssHeight}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     // --- world -> screen -------------------------------------------------
@@ -277,8 +284,37 @@ export function WorkspaceCanvas({ scene, active, focusArm }: WorkspaceCanvasProp
     }
   }, [scene, active, focusArm]);
 
+  useEffect(() => {
+    draw();
+
+    // The canvas sizes itself from its container, so it has to redraw whenever
+    // that container changes. Without this it keeps whatever width it measured
+    // on mount and overflows the viewport after a resize or orientation change.
+    //
+    // Both signals are used deliberately. ResizeObserver is the precise one —
+    // it catches container changes that do not involve the window, such as a
+    // sibling panel growing. But it does not fire under every embedded or
+    // remote-controlled viewport, so a window resize listener backs it up.
+    const onResize = () => draw();
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+
+    const parent = canvasRef.current?.parentElement;
+    const observer =
+      parent && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(onResize)
+        : null;
+    observer?.observe(parent!);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+      observer?.disconnect();
+    };
+  }, [draw]);
+
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0">
       <canvas ref={canvasRef} className="block w-full rounded-xl" />
     </div>
   );
