@@ -18,6 +18,8 @@ import { RealtimeClient } from "@speechmatics/real-time-client";
 import { usePCMAudioListener, usePCMAudioRecorderContext } from "@speechmatics/browser-audio-input-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { DEFAULT_SILENCE_MS, UtteranceAggregator } from "./utterance";
+
 export type VoiceStatus =
   | "idle"
   | "connecting"
@@ -70,6 +72,51 @@ export function useSpeechmatics({
   const audioStartedAt = useRef<number | null>(null);
   const gotFirstTranscript = useRef(false);
 
+  /**
+   * Buffers committed transcript segments into whole utterances.
+   * See utterance.ts — `AddTranscript` is a segment, not a sentence.
+   */
+  const aggregatorRef = useRef(new UtteranceAggregator());
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearSilenceTimer = useCallback(() => {
+    if (silenceTimerRef.current !== null) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+  }, []);
+
+  /**
+   * Close the current utterance and dispatch it exactly once.
+   *
+   * Safe to call repeatedly: the aggregator drains its buffer on the first
+   * call, so a duplicate `EndOfUtterance` (or a race with the silence timer)
+   * finds nothing pending and dispatches nothing.
+   */
+  const flushUtterance = useCallback(() => {
+    clearSilenceTimer();
+    const text = aggregatorRef.current.complete();
+    if (!text) return;
+    setState((s) => ({ ...s, final: text, partial: "" }));
+    onUtteranceRef.current(text);
+  }, [clearSilenceTimer]);
+
+  /**
+   * Fallback boundary. If the server never sends `EndOfUtterance` — the
+   * feature is off, or the config was rejected — emit after a pause rather
+   * than buffering forever.
+   */
+  const scheduleSilenceFlush = useCallback(() => {
+    clearSilenceTimer();
+    silenceTimerRef.current = setTimeout(() => {
+      silenceTimerRef.current = null;
+      const text = aggregatorRef.current.completeIfSilent(Date.now());
+      if (!text) return;
+      setState((s) => ({ ...s, final: text, partial: "" }));
+      onUtteranceRef.current(text);
+    }, DEFAULT_SILENCE_MS + 100);
+  }, [clearSilenceTimer]);
+
   /** Stream captured PCM frames straight to the open socket. */
   usePCMAudioListener((audio: Float32Array) => {
     const client = clientRef.current;
@@ -80,6 +127,13 @@ export function useSpeechmatics({
 
   const stop = useCallback(async () => {
     setState((s) => ({ ...s, status: "stopping" }));
+
+    // Discard anything half-spoken rather than flushing it. Pressing STOP is an
+    // instruction to stop, so firing a command on the way out would be a
+    // surprising action the operator did not ask for.
+    clearSilenceTimer();
+    aggregatorRef.current.reset();
+
     try {
       stopRecording();
     } catch {
@@ -97,7 +151,7 @@ export function useSpeechmatics({
     audioStartedAt.current = null;
     gotFirstTranscript.current = false;
     setState((s) => ({ ...s, status: "idle", partial: "" }));
-  }, [stopRecording]);
+  }, [stopRecording, clearSilenceTimer]);
 
   const start = useCallback(async () => {
     if (!audioContext) {
@@ -162,10 +216,12 @@ export function useSpeechmatics({
 
     client.addEventListener("receiveMessage", ({ data }) => {
       if (data.message === "AddPartialTranscript") {
-        const text = data.metadata.transcript;
-        setState((s) => ({ ...s, partial: text }));
+        // Caption only. A partial is still changing and must never reach the
+        // parser, let alone move an arm.
+        setState((s) => ({ ...s, partial: data.metadata.transcript }));
       } else if (data.message === "AddTranscript") {
-        const text = data.metadata.transcript.trim();
+        // A committed *segment*, not a whole utterance. Buffer it.
+        const text = data.metadata.transcript;
 
         if (!gotFirstTranscript.current && audioStartedAt.current !== null) {
           gotFirstTranscript.current = true;
@@ -173,10 +229,20 @@ export function useSpeechmatics({
           setState((s) => ({ ...s, firstTranscriptLatencyMs: latency }));
         }
 
-        if (text) {
-          setState((s) => ({ ...s, final: text, partial: "" }));
-          onUtteranceRef.current(text);
-        }
+        aggregatorRef.current.addFinalSegment(text, Date.now());
+
+        // Show the committed-so-far text as the caption, and clear the partial
+        // it superseded.
+        setState((s) => ({
+          ...s,
+          partial: "",
+          final: aggregatorRef.current.buffered,
+        }));
+
+        scheduleSilenceFlush();
+      } else if (data.message === "EndOfUtterance") {
+        // The server's own sentence boundary — the authoritative signal.
+        flushUtterance();
       } else if (data.message === "Error") {
         setState((s) => ({
           ...s,
@@ -205,6 +271,13 @@ export function useSpeechmatics({
           // Low delay matters here: the transcript gates a physical action, so
           // latency is felt directly by the operator.
           max_delay: 1.2,
+          // Ask the server to detect when the speaker has stopped, so we get an
+          // explicit `EndOfUtterance` sentence boundary instead of having to
+          // infer one. Without this, the only signal is a stream of committed
+          // segments with no indication of where a sentence ends.
+          conversation_config: {
+            end_of_utterance_silence_trigger: 0.8,
+          },
         },
         audio_format: {
           type: "raw",
@@ -225,11 +298,20 @@ export function useSpeechmatics({
     }
 
     setState((s) => ({ ...s, status: "listening", message: null }));
-  }, [audioContext, language, startRecording, stopRecording]);
+  }, [
+    audioContext,
+    language,
+    startRecording,
+    stopRecording,
+    flushUtterance,
+    scheduleSilenceFlush,
+  ]);
 
   // Tear the socket down if the component unmounts mid-session.
   useEffect(() => {
+    const timers = silenceTimerRef;
     return () => {
+      if (timers.current !== null) clearTimeout(timers.current);
       const client = clientRef.current;
       clientRef.current = null;
       client?.stopRecognition({ noTimeout: true }).catch(() => {});

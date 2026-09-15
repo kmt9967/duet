@@ -24,6 +24,7 @@ import { parseCommand } from "../src/lib/language/parser";
 import { planIntents } from "../src/lib/planner/planner";
 import { generateScene } from "../src/lib/core/scene";
 import { executePlan } from "../src/lib/sim/executor";
+import { UtteranceAggregator } from "../src/lib/voice/utterance";
 
 const AUDIO_DIR = resolve(process.cwd(), "evidence/speechmatics/audio");
 const OUT_PATH = resolve(process.cwd(), "evidence/speechmatics/live-test.json");
@@ -68,7 +69,16 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 type Result = {
   file: string;
   partials: string[];
+  /** Raw AddTranscript segments — these are NOT whole utterances. */
   finals: string[];
+  /** How many EndOfUtterance boundaries the server sent. */
+  endOfUtteranceCount: number;
+  /**
+   * Commands the browser would dispatch. Produced by the same
+   * UtteranceAggregator the production hook uses, so this number is the real
+   * "one sentence = one command" assertion.
+   */
+  commands: string[];
   transcript: string;
   firstPartialMs: number | null;
   firstFinalMs: number | null;
@@ -80,16 +90,36 @@ type Result = {
   diagnostics: string[];
 };
 
+/** Minting occasionally fails on a transient network error; retry briefly. */
+async function mintJwt(apiKey: string): Promise<string> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await createSpeechmaticsJWT({ type: "rt", apiKey, ttl: 120 });
+    } catch (error) {
+      lastError = error;
+      await sleep(1500 * (attempt + 1));
+    }
+  }
+  throw lastError;
+}
+
 async function transcribe(apiKey: string, file: string): Promise<Result> {
-  const jwt = await createSpeechmaticsJWT({ type: "rt", apiKey, ttl: 120 });
+  const jwt = await mintJwt(apiKey);
   const client = new RealtimeClient();
 
   const partials: string[] = [];
   const finals: string[] = [];
+  const commands: string[] = [];
+  let endOfUtteranceCount = 0;
   let firstPartialMs: number | null = null;
   let firstFinalMs: number | null = null;
   let done = false;
   let socketError: string | null = null;
+
+  // Mirrors the browser hook exactly: segments accumulate, and only a boundary
+  // releases a command.
+  const aggregator = new UtteranceAggregator();
 
   client.addEventListener("receiveMessage", ({ data }) => {
     if (data.message === "AddPartialTranscript") {
@@ -103,7 +133,12 @@ async function transcribe(apiKey: string, file: string): Promise<Result> {
       if (text) {
         firstFinalMs ??= Date.now() - startedAt;
         finals.push(text);
+        aggregator.addFinalSegment(text, Date.now());
       }
+    } else if (data.message === "EndOfUtterance") {
+      endOfUtteranceCount += 1;
+      const utterance = aggregator.complete();
+      if (utterance) commands.push(utterance);
     } else if (data.message === "EndOfTranscript") {
       done = true;
     } else if (data.message === "Error") {
@@ -122,6 +157,7 @@ async function transcribe(apiKey: string, file: string): Promise<Result> {
       model: "enhanced",
       enable_partials: true,
       max_delay: 1.2,
+      conversation_config: { end_of_utterance_silence_trigger: 0.8 },
     },
     audio_format: {
       type: "raw",
@@ -130,7 +166,15 @@ async function transcribe(apiKey: string, file: string): Promise<Result> {
     },
   });
 
-  const pcm = pcmFromWav(join(AUDIO_DIR, file));
+  const speech = pcmFromWav(join(AUDIO_DIR, file));
+
+  // Synthesised audio stops dead on the last word. A real microphone keeps
+  // streaming while the speaker pauses, and that silence is exactly what the
+  // server's end-of-utterance detector listens for. Without padding, the stream
+  // ends before the 0.8s trigger can elapse and no EndOfUtterance is ever sent.
+  const silence = Buffer.alloc(SAMPLE_RATE * BYTES_PER_SAMPLE * 2); // 2 seconds
+  const pcm = Buffer.concat([speech, silence]);
+
   for (let i = 0; i < pcm.length && !socketError; i += CHUNK_BYTES) {
     client.sendAudio(pcm.subarray(i, Math.min(i + CHUNK_BYTES, pcm.length)));
     await sleep(CHUNK_MS);
@@ -146,7 +190,13 @@ async function transcribe(apiKey: string, file: string): Promise<Result> {
 
   if (socketError) throw new Error(`Speechmatics error: ${socketError}`);
 
-  const transcript = finals.join(" ").trim();
+  // Anything still buffered when the stream ends is a complete utterance too —
+  // the speaker stopped because the audio ran out.
+  const trailing = aggregator.complete();
+  if (trailing) commands.push(trailing);
+
+  // The command the operator actually issued. Exactly one is expected.
+  const transcript = commands.join(" ").trim();
 
   // --- prove that the FINAL transcript drives the robot, end to end --------
   const parsed = parseCommand(transcript);
@@ -163,6 +213,8 @@ async function transcribe(apiKey: string, file: string): Promise<Result> {
     file,
     partials,
     finals,
+    endOfUtteranceCount,
+    commands,
     transcript,
     firstPartialMs,
     firstFinalMs,
@@ -200,7 +252,12 @@ async function main() {
       results.push(result);
       console.log(`  partials seen   ${result.partials.length}` +
         (result.firstPartialMs !== null ? ` (first at ${result.firstPartialMs} ms)` : ""));
-      console.log(`  final           "${result.transcript}"`);
+      console.log(`  final segments  ${result.finals.length} -> ${result.finals.map((f) => `"${f}"`).join(" ")}`);
+      console.log(`  EndOfUtterance  ${result.endOfUtteranceCount}`);
+      console.log(
+        `  COMMANDS        ${result.commands.length} ${result.commands.length === 1 ? "(correct)" : "(EXPECTED 1)"}` +
+          ` -> ${result.commands.map((c) => `"${c}"`).join(" | ")}`,
+      );
       console.log(`  intents         ${result.intents.join(", ") || "(none)"}`);
       console.log(`  plan            ${result.planSteps} steps, ${result.handoffs} hand-offs, ${result.executedSteps} executed`);
       if (result.planErrors.length) console.log(`  plan errors     ${result.planErrors[0]}`);
@@ -208,8 +265,8 @@ async function main() {
     } catch (error) {
       console.log(`  FAILED: ${error instanceof Error ? error.message : error}`);
       results.push({
-        file, partials: [], finals: [], transcript: "",
-        firstPartialMs: null, firstFinalMs: null, intents: [],
+        file, partials: [], finals: [], endOfUtteranceCount: 0, commands: [],
+        transcript: "", firstPartialMs: null, firstFinalMs: null, intents: [],
         planSteps: 0, handoffs: 0, executedSteps: 0,
         planErrors: [String(error)], diagnostics: [],
       });
@@ -218,10 +275,15 @@ async function main() {
 
   const transcribed = results.filter((r) => r.transcript.length > 0).length;
   const actionable = results.filter((r) => r.planSteps > 0 || r.intents.includes("stop")).length;
+  const oneCommandEach = results.filter((r) => r.commands.length === 1).length;
 
   console.log("\n" + "=".repeat(76));
-  console.log(`Transcribed   ${transcribed}/${results.length}`);
-  console.log(`Actionable    ${actionable}/${results.length}`);
+  console.log(`Transcribed          ${transcribed}/${results.length}`);
+  console.log(`Actionable           ${actionable}/${results.length}`);
+  console.log(
+    `One command / sentence ${oneCommandEach}/${results.length}` +
+      (oneCommandEach === results.length ? "  <- no fragment spam" : "  <- FRAGMENTS LEAKING"),
+  );
   console.log("=".repeat(76) + "\n");
 
   mkdirSync(resolve(process.cwd(), "evidence/speechmatics"), { recursive: true });

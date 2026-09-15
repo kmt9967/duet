@@ -18,7 +18,25 @@
 
 Speechmatics is the operator interface for a physical task, not a transcription demo bolted on. The transcript gates a robot action, which shapes three decisions:
 
-**Partials caption, finals execute.** `AddPartialTranscript` drives the live caption so the operator sees they are being heard. Only `AddTranscript` — a settled utterance — is parsed and executed. A half-recognised phrase never reaches the planner and therefore never moves an arm.
+**Partials caption, complete utterances execute.** `AddPartialTranscript` drives the live caption so the operator sees they are being heard. Nothing is parsed or executed until a whole sentence is assembled.
+
+**`AddTranscript` is a segment, not a sentence.** This is the single most important detail in the integration, and getting it wrong caused a production bug. An `AddTranscript` message carries the portion of audio the recogniser has just *committed* — speaking "Set the dinner table." produces four of them:
+
+```
+AddTranscript  "Set"
+AddTranscript  "the"
+AddTranscript  "dinner"
+AddTranscript  "table."
+EndOfUtterance
+```
+
+Dispatching on each one sends four fragments through the parser, all rejected, and floods the command log — while the sentence the operator actually spoke never runs.
+
+Segments are therefore buffered by [`src/lib/voice/utterance.ts`](../src/lib/voice/utterance.ts) and released as one command on a sentence boundary.
+
+**The boundary comes from the server.** `transcription_config.conversation_config.end_of_utterance_silence_trigger` is set to `0.8`, so Speechmatics emits `EndOfUtterance` once the speaker has paused. A client-side silence timeout backs it up, so a missing or rejected config degrades to "emit after a pause" rather than never emitting.
+
+**Duplicate boundaries are inherently safe.** The aggregator drains its buffer on the first boundary, so a repeated `EndOfUtterance` — or a race between the server boundary and the fallback timer — finds nothing pending and dispatches nothing. No timestamp or text-matching heuristic is involved, which means genuinely repeating a phrase ("Stop." twice) still produces two commands.
 
 **Low delay is a functional requirement, not a nicety.** `max_delay` is set to 1.2 s because the operator is waiting on a physical outcome; latency is felt directly rather than read later.
 
@@ -84,16 +102,26 @@ through the actual parser, planner and executor. Raw output is committed at
 [`evidence/speechmatics/live-test.json`](../evidence/speechmatics/live-test.json),
 with the source audio in `evidence/speechmatics/audio/`.
 
-| Utterance sent | Transcript returned | Intents | Plan |
-|---|---|---|---|
-| "Set the dinner table." | *Set the dinner table.* | `set_table` | 27 steps, 3 hand-offs, 27 executed |
-| "Pick up the mug and place it on the right setting." | *Pick up the mug and place it on the right setting.* | `pick, place` | 4 steps, 4 executed |
-| "Open the top drawer, pick up the plate with arm A, place it on the table." | *Open the top drawer. Pick up the plate with arm. Place it on the table.* | `open_drawer, pick, place` | 6 steps, 6 executed |
-| "Stop." | *Stop.* | `stop` | 0 steps — control intent, correctly not planned |
-| "Place the fork on the right setting." | *Place the fork on the right setting.* | `place` | 8 steps, 1 hand-off, 8 executed |
+| Utterance sent | Segments | EoU | Commands | Intents | Plan |
+|---|---|---|---|---|---|
+| "Set the dinner table." | 4 | 1 | **1** | `set_table` | 27 steps, 3 hand-offs |
+| "Pick up the mug and place it on the right setting." | 7 | 1 | **1** | `pick, place` | 4 steps |
+| "Open the top drawer, pick up the plate with arm A, place it on the table." | 11 | 1 | **1** | `open_drawer, pick, place` | 6 steps |
+| "Stop." | 2 | 1 | **1** | `stop` | 0 steps — control intent, correctly not planned |
+| "Place the fork on the right setting." | 6 | 1 | **1** | `place` | 8 steps, 1 hand-off |
 
-**Transcribed 5/5. Actionable 5/5.** First partial arrived at 1488–1913 ms across
-the five runs.
+**Transcribed 5/5. Actionable 5/5. One command per sentence 5/5.** First partial
+arrived at 1463–1878 ms.
+
+The *Segments* column is the point: "Set the dinner table." arrives as
+`"Set" "the" "dinner" "table."` and is released as a single command. Before the
+fix that was four rejected commands in the log.
+
+Note the test streams two seconds of silence after each clip. Synthesised audio
+stops dead on the last word, whereas a real microphone keeps streaming while the
+speaker pauses — and that silence is precisely what the end-of-utterance
+detector needs. Without the padding no `EndOfUtterance` is ever sent, which is
+how the missing boundary was first diagnosed.
 
 ### What the third row shows
 

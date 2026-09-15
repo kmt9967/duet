@@ -20,16 +20,22 @@
         "Set the",
         "Set the dinner",
         "the dinner table",
-        "dinner table."
+        "dinner table.",
+        "table."
       ],
       "finals": [
         "Set",
         "the",
-        "dinner table."
+        "dinner",
+        "table."
+      ],
+      "endOfUtteranceCount": 1,
+      "commands": [
+        "Set the dinner table."
       ],
       "transcript": "Set the dinner table.",
-      "firstPartialMs": 1561,
-      "firstFinalMs": 2321,
+      "firstPartialMs": 1570,
+      "firstFinalMs": 2336,
       "intents": [
         "set_table"
       ],
@@ -49,6 +55,7 @@
         "place it on the",
         "it on the right side",
         "the right setting",
+        "setting",
         "setting"
       ],
       "finals": [
@@ -60,9 +67,13 @@
         "the right",
         "setting."
       ],
+      "endOfUtteranceCount": 1,
+      "commands": [
+        "Pick up the mug and place it on the right setting."
+      ],
       "transcript": "Pick up the mug and place it on the right setting.",
-      "firstPartialMs": 1488,
-      "firstFinalMs": 2244,
+      "firstPartialMs": 1463,
+      "firstFinalMs": 2218,
       "intents": [
         "pick",
         "place"
@@ -102,11 +113,16 @@
         "arm.",
         "Place it on",
         "the",
-        "table."
+        "table",
+        "."
+      ],
+      "endOfUtteranceCount": 1,
+      "commands": [
+        "Open the top drawer. Pick up the plate with arm. Place it on the table."
       ],
       "transcript": "Open the top drawer. Pick up the plate with arm. Place it on the table.",
-      "firstPartialMs": 1523,
-      "firstFinalMs": 2281,
+      "firstPartialMs": 1518,
+      "firstFinalMs": 2271,
       "intents": [
         "open_drawer",
         "pick",
@@ -125,11 +141,16 @@
         "Stop"
       ],
       "finals": [
+        "Stop",
+        "."
+      ],
+      "endOfUtteranceCount": 1,
+      "commands": [
         "Stop."
       ],
       "transcript": "Stop.",
-      "firstPartialMs": 1913,
-      "firstFinalMs": 2650,
+      "firstPartialMs": 1878,
+      "firstFinalMs": 2728,
       "intents": [
         "stop"
       ],
@@ -147,17 +168,24 @@
         "Place the fork on",
         "fork on the right",
         "the right setting",
-        "right setting"
+        "right setting",
+        "setting"
       ],
       "finals": [
         "Place the",
         "fork on",
         "the",
-        "right setting."
+        "right",
+        "setting",
+        "."
+      ],
+      "endOfUtteranceCount": 1,
+      "commands": [
+        "Place the fork on the right setting."
       ],
       "transcript": "Place the fork on the right setting.",
-      "firstPartialMs": 1531,
-      "firstFinalMs": 2714,
+      "firstPartialMs": 1537,
+      "firstFinalMs": 2721,
       "intents": [
         "place"
       ],
