@@ -6,12 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "bench": "tsx scripts/benchmark.ts",
+    "bench:json": "tsx scripts/benchmark.ts --json",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run bench"
   },
   "dependencies": {
+    "@speechmatics/auth": "^0.1.0",
+    "@speechmatics/browser-audio-input-react": "^2.0.4",
+    "@speechmatics/real-time-client": "^8.5.1",
     "next": "16.3.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -21,6 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5"
   }
 }

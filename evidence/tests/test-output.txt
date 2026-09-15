@@ -1,0 +1,59 @@
+﻿
+> duet@0.1.0 test
+> node --import tsx --test tests/*.test.ts
+
+▶ inverse kinematics
+  ✔ IK solutions round-trip through FK (2.1405ms)
+  ✔ solutions always respect joint limits (0.7315ms)
+  ✔ rejects targets beyond full extension (0.3134ms)
+  ✔ the workspace is an annulus, not a disc (0.8986ms)
+  ✔ planar reach at table height is well under full extension (3.1583ms)
+✔ inverse kinematics (10.7986ms)
+▶ normalize
+  ✔ preserves clause boundaries as markers rather than deleting them (2.2567ms)
+  ✔ strips filler words that ASR emits (0.5125ms)
+  ✔ lowercases and is idempotent on already-clean input (0.2972ms)
+✔ normalize (5.5179ms)
+▶ splitClauses
+  ✔ splits an unpunctuated run-on at verb boundaries (21.7299ms)
+  ✔ does not split 'and' joining two noun phrases (3.5472ms)
+  ✔ does not treat 'setting' as the verb 'set' (0.4448ms)
+✔ splitClauses (27.921ms)
+▶ parseCommand
+  ✔ parses the challenge brief's worked example into five intents (5.5757ms)
+  ✔ binds explicit arm assignments (0.6207ms)
+  ✔ accepts ASR homophones for arm names (0.4309ms)
+  ✔ maps object synonyms to canonical kinds (2.0317ms)
+  ✔ recognises control verbs (0.6065ms)
+  ✔ reports uninterpretable input instead of failing silently (0.3337ms)
+  ✔ never throws on empty or whitespace input (0.3012ms)
+✔ parseCommand (11.633ms)
+▶ plan graph
+  ✔ is always acyclic (17.54ms)
+  ✔ every dependency refers to a step in the same plan (3.8567ms)
+  ✔ an arm never runs two steps concurrently (15.2393ms)
+✔ plan graph (38.6942ms)
+▶ bimanual behaviour
+  ✔ crossing the table inserts a hand-off (5.1531ms)
+  ✔ a hand-off is always give-then-take on opposite arms (3.1963ms)
+  ✔ multi-step plans achieve genuine two-arm parallelism (3.7426ms)
+✔ bimanual behaviour (12.7393ms)
+▶ preconditions
+  ✔ reaching cutlery opens the drawer first, exactly once (2.6797ms)
+✔ preconditions (3.006ms)
+▶ determinism
+  ✔ the same seed produces an identical plan every time (7.6874ms)
+  ✔ different seeds produce genuinely different scenes (1.0727ms)
+✔ determinism (9.0387ms)
+▶ failure handling
+  ✔ an unsatisfiable command is reported, not silently dropped (1.0493ms)
+  ✔ steps downstream of a failure are skipped, never executed (6.0352ms)
+✔ failure handling (7.3876ms)
+ℹ tests 29
+ℹ suites 9
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 478.3506
