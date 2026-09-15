@@ -111,12 +111,33 @@ export function useSpeechmatics({
 
     setState((s) => ({ ...s, status: "connecting", message: null }));
 
-    // 1. Ask our server for a temporary token. The API key stays server-side.
+    // 1. Open the microphone FIRST.
+    //
+    // Ordering matters for cost: minting a token and opening the socket before
+    // knowing whether we can actually capture audio would consume a Speechmatics
+    // session every time permission is denied. Asking for the microphone first
+    // means a refused prompt costs nothing.
+    try {
+      await startRecording({});
+    } catch (error) {
+      setState((s) => ({
+        ...s,
+        status: "unavailable",
+        message:
+          error instanceof Error && error.name === "NotAllowedError"
+            ? "Microphone permission denied. Typed commands still work."
+            : "Could not open the microphone. Typed commands still work.",
+      }));
+      return;
+    }
+
+    // 2. Ask our server for a temporary token. The API key stays server-side.
     let jwt: string;
     try {
       const response = await fetch("/api/speechmatics-token", { method: "POST" });
       const body = await response.json();
       if (!response.ok || !body.jwt) {
+        stopRecording();
         setState((s) => ({
           ...s,
           status: "unavailable",
@@ -126,6 +147,7 @@ export function useSpeechmatics({
       }
       jwt = body.jwt as string;
     } catch {
+      stopRecording();
       setState((s) => ({
         ...s,
         status: "unavailable",
@@ -134,7 +156,7 @@ export function useSpeechmatics({
       return;
     }
 
-    // 2. Open the real-time socket.
+    // 3. Open the real-time socket.
     const client = new RealtimeClient();
     clientRef.current = client;
 
@@ -176,7 +198,9 @@ export function useSpeechmatics({
       await client.start(jwt, {
         transcription_config: {
           language,
-          operating_point: "enhanced",
+          // `model` supersedes the deprecated `operating_point` field; the API
+          // emits a deprecation warning if the old name is used.
+          model: "enhanced",
           enable_partials: true,
           // Low delay matters here: the transcript gates a physical action, so
           // latency is felt directly by the operator.
@@ -190,6 +214,7 @@ export function useSpeechmatics({
       });
     } catch (error) {
       clientRef.current = null;
+      stopRecording();
       setState((s) => ({
         ...s,
         status: "error",
@@ -199,24 +224,8 @@ export function useSpeechmatics({
       return;
     }
 
-    // 3. Start the microphone only once the socket is ready.
-    try {
-      await startRecording({});
-    } catch (error) {
-      await stop();
-      setState((s) => ({
-        ...s,
-        status: "unavailable",
-        message:
-          error instanceof Error && error.name === "NotAllowedError"
-            ? "Microphone permission denied. Typed commands still work."
-            : "Could not open the microphone. Typed commands still work.",
-      }));
-      return;
-    }
-
     setState((s) => ({ ...s, status: "listening", message: null }));
-  }, [audioContext, language, startRecording, stop]);
+  }, [audioContext, language, startRecording, stopRecording]);
 
   // Tear the socket down if the component unmounts mid-session.
   useEffect(() => {

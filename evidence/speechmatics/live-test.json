@@ -1,0 +1,171 @@
+{
+  "note": "Live test against the Speechmatics real-time API. Transcripts are returned over the network, not mocked. API key is not recorded here.",
+  "endpoint": "wss://eu2.rt.speechmatics.com/v2",
+  "config": {
+    "language": "en",
+    "operating_point": "enhanced",
+    "enable_partials": true,
+    "max_delay": 1.2
+  },
+  "audioFormat": {
+    "encoding": "pcm_s16le",
+    "sample_rate": 16000
+  },
+  "transcribed": 5,
+  "total": 5,
+  "results": [
+    {
+      "file": "01-set-the-table.wav",
+      "partials": [
+        "Set the",
+        "Set the dinner",
+        "the dinner table",
+        "dinner table."
+      ],
+      "finals": [
+        "Set",
+        "the",
+        "dinner table."
+      ],
+      "transcript": "Set the dinner table.",
+      "firstPartialMs": 1561,
+      "firstFinalMs": 2321,
+      "intents": [
+        "set_table"
+      ],
+      "planSteps": 27,
+      "handoffs": 3,
+      "executedSteps": 27,
+      "planErrors": [],
+      "diagnostics": []
+    },
+    {
+      "file": "02-cross-transfer.wav",
+      "partials": [
+        "Pick",
+        "Pick up the money",
+        "up the mug and",
+        "mug and place it",
+        "place it on the",
+        "it on the right side",
+        "the right setting",
+        "setting"
+      ],
+      "finals": [
+        "Pick",
+        "up the",
+        "mug and",
+        "place",
+        "it on",
+        "the right",
+        "setting."
+      ],
+      "transcript": "Pick up the mug and place it on the right setting.",
+      "firstPartialMs": 1488,
+      "firstFinalMs": 2244,
+      "intents": [
+        "pick",
+        "place"
+      ],
+      "planSteps": 4,
+      "handoffs": 0,
+      "executedSteps": 4,
+      "planErrors": [],
+      "diagnostics": []
+    },
+    {
+      "file": "03-brief-example.wav",
+      "partials": [
+        "Open the",
+        "Open the top",
+        "the top drawer",
+        "drawer.",
+        "drawer. Pick",
+        "Pick up the",
+        "Pick up the plate",
+        "the plate with",
+        "with Armée",
+        "arm",
+        "arm. Place",
+        "Place it on",
+        "Place it on the table",
+        "the table.",
+        "table."
+      ],
+      "finals": [
+        "Open",
+        "the top",
+        "drawer.",
+        "Pick up",
+        "the plate",
+        "with",
+        "arm.",
+        "Place it on",
+        "the",
+        "table."
+      ],
+      "transcript": "Open the top drawer. Pick up the plate with arm. Place it on the table.",
+      "firstPartialMs": 1523,
+      "firstFinalMs": 2281,
+      "intents": [
+        "open_drawer",
+        "pick",
+        "place"
+      ],
+      "planSteps": 6,
+      "handoffs": 0,
+      "executedSteps": 6,
+      "planErrors": [],
+      "diagnostics": []
+    },
+    {
+      "file": "04-stop.wav",
+      "partials": [
+        "Stop",
+        "Stop"
+      ],
+      "finals": [
+        "Stop."
+      ],
+      "transcript": "Stop.",
+      "firstPartialMs": 1913,
+      "firstFinalMs": 2650,
+      "intents": [
+        "stop"
+      ],
+      "planSteps": 0,
+      "handoffs": 0,
+      "executedSteps": 0,
+      "planErrors": [],
+      "diagnostics": []
+    },
+    {
+      "file": "05-fork-beside-plate.wav",
+      "partials": [
+        "Place",
+        "Place. The",
+        "Place the fork on",
+        "fork on the right",
+        "the right setting",
+        "right setting"
+      ],
+      "finals": [
+        "Place the",
+        "fork on",
+        "the",
+        "right setting."
+      ],
+      "transcript": "Place the fork on the right setting.",
+      "firstPartialMs": 1531,
+      "firstFinalMs": 2714,
+      "intents": [
+        "place"
+      ],
+      "planSteps": 8,
+      "handoffs": 1,
+      "executedSteps": 8,
+      "planErrors": [],
+      "diagnostics": []
+    }
+  ]
+}

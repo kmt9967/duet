@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "bench": "tsx scripts/benchmark.ts",
+    "test:voice": "tsx scripts/live-voice-test.ts",
     "bench:json": "tsx scripts/benchmark.ts --json",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run bench"
   },
