@@ -3,52 +3,52 @@
 > node --import tsx --test tests/*.test.ts
 
 ▶ inverse kinematics
-  ✔ IK solutions round-trip through FK (2.1405ms)
-  ✔ solutions always respect joint limits (0.7315ms)
-  ✔ rejects targets beyond full extension (0.3134ms)
-  ✔ the workspace is an annulus, not a disc (0.8986ms)
-  ✔ planar reach at table height is well under full extension (3.1583ms)
-✔ inverse kinematics (10.7986ms)
+  ✔ IK solutions round-trip through FK (2.1709ms)
+  ✔ solutions always respect joint limits (0.3529ms)
+  ✔ rejects targets beyond full extension (0.7523ms)
+  ✔ the workspace is an annulus, not a disc (0.4387ms)
+  ✔ planar reach at table height is well under full extension (0.3434ms)
+✔ inverse kinematics (11.3347ms)
 ▶ normalize
-  ✔ preserves clause boundaries as markers rather than deleting them (2.2567ms)
-  ✔ strips filler words that ASR emits (0.5125ms)
-  ✔ lowercases and is idempotent on already-clean input (0.2972ms)
-✔ normalize (5.5179ms)
+  ✔ preserves clause boundaries as markers rather than deleting them (2.4732ms)
+  ✔ strips filler words that ASR emits (0.487ms)
+  ✔ lowercases and is idempotent on already-clean input (0.2598ms)
+✔ normalize (5.2368ms)
 ▶ splitClauses
-  ✔ splits an unpunctuated run-on at verb boundaries (21.7299ms)
-  ✔ does not split 'and' joining two noun phrases (3.5472ms)
-  ✔ does not treat 'setting' as the verb 'set' (0.4448ms)
-✔ splitClauses (27.921ms)
+  ✔ splits an unpunctuated run-on at verb boundaries (5.0603ms)
+  ✔ does not split 'and' joining two noun phrases (0.4051ms)
+  ✔ does not treat 'setting' as the verb 'set' (0.2743ms)
+✔ splitClauses (6.1964ms)
 ▶ parseCommand
-  ✔ parses the challenge brief's worked example into five intents (5.5757ms)
-  ✔ binds explicit arm assignments (0.6207ms)
-  ✔ accepts ASR homophones for arm names (0.4309ms)
-  ✔ maps object synonyms to canonical kinds (2.0317ms)
-  ✔ recognises control verbs (0.6065ms)
-  ✔ reports uninterpretable input instead of failing silently (0.3337ms)
-  ✔ never throws on empty or whitespace input (0.3012ms)
-✔ parseCommand (11.633ms)
+  ✔ parses the challenge brief's worked example into five intents (5.0459ms)
+  ✔ binds explicit arm assignments (0.4023ms)
+  ✔ accepts ASR homophones for arm names (0.3405ms)
+  ✔ maps object synonyms to canonical kinds (0.3925ms)
+  ✔ recognises control verbs (0.3681ms)
+  ✔ reports uninterpretable input instead of failing silently (0.3481ms)
+  ✔ never throws on empty or whitespace input (0.2765ms)
+✔ parseCommand (7.9318ms)
 ▶ plan graph
-  ✔ is always acyclic (17.54ms)
-  ✔ every dependency refers to a step in the same plan (3.8567ms)
-  ✔ an arm never runs two steps concurrently (15.2393ms)
-✔ plan graph (38.6942ms)
+  ✔ is always acyclic (18.8977ms)
+  ✔ every dependency refers to a step in the same plan (3.9387ms)
+  ✔ an arm never runs two steps concurrently (16.2677ms)
+✔ plan graph (40.8597ms)
 ▶ bimanual behaviour
-  ✔ crossing the table inserts a hand-off (5.1531ms)
-  ✔ a hand-off is always give-then-take on opposite arms (3.1963ms)
-  ✔ multi-step plans achieve genuine two-arm parallelism (3.7426ms)
-✔ bimanual behaviour (12.7393ms)
+  ✔ crossing the table inserts a hand-off (7.53ms)
+  ✔ a hand-off is always give-then-take on opposite arms (3.8404ms)
+  ✔ multi-step plans achieve genuine two-arm parallelism (2.8873ms)
+✔ bimanual behaviour (14.7742ms)
 ▶ preconditions
-  ✔ reaching cutlery opens the drawer first, exactly once (2.6797ms)
-✔ preconditions (3.006ms)
+  ✔ reaching cutlery opens the drawer first, exactly once (3.9038ms)
+✔ preconditions (4.2448ms)
 ▶ determinism
-  ✔ the same seed produces an identical plan every time (7.6874ms)
-  ✔ different seeds produce genuinely different scenes (1.0727ms)
-✔ determinism (9.0387ms)
+  ✔ the same seed produces an identical plan every time (7.7451ms)
+  ✔ different seeds produce genuinely different scenes (1.1925ms)
+✔ determinism (9.2411ms)
 ▶ failure handling
-  ✔ an unsatisfiable command is reported, not silently dropped (1.0493ms)
-  ✔ steps downstream of a failure are skipped, never executed (6.0352ms)
-✔ failure handling (7.3876ms)
+  ✔ an unsatisfiable command is reported, not silently dropped (0.6146ms)
+  ✔ steps downstream of a failure are skipped, never executed (6.564ms)
+✔ failure handling (7.3971ms)
 ℹ tests 29
 ℹ suites 9
 ℹ pass 29
@@ -56,4 +56,4 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 478.3506
+ℹ duration_ms 488.9795
