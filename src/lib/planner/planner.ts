@@ -650,6 +650,7 @@ function planOne(state: PlanningState, intent: Intent): PlanError | null {
       };
 
     case "stop":
+    case "resume":
     case "reset":
     case "query_state":
       // Control intents are handled by the session layer, not the planner.

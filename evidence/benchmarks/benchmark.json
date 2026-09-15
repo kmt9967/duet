@@ -6,8 +6,8 @@
     "node": "v24.15.0",
     "platform": "win32 x64"
   },
-  "totalRuntimeMs": 45.974699999999984,
-  "generatedAt": "2026-09-15T04:34:18.592Z",
+  "totalRuntimeMs": 44.602599999999995,
+  "generatedAt": "2026-09-15T05:00:22.364Z",
   "seeds": [
     1,
     2,
@@ -51,7 +51,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 8300,
-          "pipelineMs": 12.124599999999987,
+          "pipelineMs": 12.22829999999999,
           "planErrors": []
         },
         {
@@ -79,7 +79,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 6150,
-          "pipelineMs": 1.789199999999994,
+          "pipelineMs": 1.7776000000000067,
           "planErrors": []
         },
         {
@@ -107,7 +107,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 5300,
-          "pipelineMs": 1.09020000000001,
+          "pipelineMs": 0.9416999999999973,
           "planErrors": []
         },
         {
@@ -135,7 +135,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 6800,
-          "pipelineMs": 0.9601999999999862,
+          "pipelineMs": 1.6588999999999885,
           "planErrors": []
         },
         {
@@ -163,7 +163,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 7300,
-          "pipelineMs": 1.7676000000000158,
+          "pipelineMs": 0.8617999999999881,
           "planErrors": []
         },
         {
@@ -191,7 +191,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 5300,
-          "pipelineMs": 0.8179999999999836,
+          "pipelineMs": 0.7711999999999932,
           "planErrors": []
         },
         {
@@ -219,7 +219,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 5300,
-          "pipelineMs": 0.7734000000000094,
+          "pipelineMs": 1.3155000000000143,
           "planErrors": []
         },
         {
@@ -247,7 +247,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 5300,
-          "pipelineMs": 0.5978000000000065,
+          "pipelineMs": 0.6616000000000213,
           "planErrors": []
         },
         {
@@ -275,7 +275,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 5300,
-          "pipelineMs": 0.6993999999999971,
+          "pipelineMs": 0.7087999999999965,
           "planErrors": []
         },
         {
@@ -303,14 +303,14 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 7300,
-          "pipelineMs": 0.6668999999999983,
+          "pipelineMs": 0.6622999999999877,
           "planErrors": []
         }
       ],
       "successCount": 10,
       "successRate": 1,
-      "meanPipelineMs": 2.1287299999999987,
-      "p95PipelineMs": 12.124599999999987,
+      "meanPipelineMs": 2.1587699999999983,
+      "p95PipelineMs": 12.22829999999999,
       "meanStepCount": 10.8,
       "totalHandoffs": 4
     },
@@ -340,7 +340,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 2650,
-          "pipelineMs": 0.6517000000000053,
+          "pipelineMs": 0.6341999999999928,
           "planErrors": []
         },
         {
@@ -364,7 +364,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 4150,
-          "pipelineMs": 0.6709000000000174,
+          "pipelineMs": 0.6783000000000072,
           "planErrors": []
         },
         {
@@ -388,7 +388,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 4150,
-          "pipelineMs": 0.5278999999999883,
+          "pipelineMs": 0.36520000000001573,
           "planErrors": []
         },
         {
@@ -412,7 +412,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 2650,
-          "pipelineMs": 0.42259999999998854,
+          "pipelineMs": 0.3842000000000212,
           "planErrors": []
         },
         {
@@ -436,7 +436,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 4150,
-          "pipelineMs": 0.4043999999999812,
+          "pipelineMs": 0.3877999999999986,
           "planErrors": []
         },
         {
@@ -460,7 +460,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 2650,
-          "pipelineMs": 0.43840000000000146,
+          "pipelineMs": 0.4333999999999776,
           "planErrors": []
         },
         {
@@ -484,7 +484,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 4150,
-          "pipelineMs": 1.065400000000011,
+          "pipelineMs": 0.3503999999999792,
           "planErrors": []
         },
         {
@@ -508,7 +508,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 4150,
-          "pipelineMs": 0.8745999999999867,
+          "pipelineMs": 0.420599999999979,
           "planErrors": []
         },
         {
@@ -532,7 +532,7 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 2650,
-          "pipelineMs": 0.5250000000000057,
+          "pipelineMs": 0.5142000000000166,
           "planErrors": []
         },
         {
@@ -556,14 +556,14 @@
           "plannedParallelism": 1,
           "realisedParallelism": 1,
           "simulatedDurationMs": 4150,
-          "pipelineMs": 0.44930000000002224,
+          "pipelineMs": 0.4188000000000045,
           "planErrors": []
         }
       ],
       "successCount": 10,
       "successRate": 1,
-      "meanPipelineMs": 0.6030200000000008,
-      "p95PipelineMs": 1.065400000000011,
+      "meanPipelineMs": 0.45870999999999923,
+      "p95PipelineMs": 0.6783000000000072,
       "meanStepCount": 5.2,
       "totalHandoffs": 6
     },
@@ -593,7 +593,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 8900,
-          "pipelineMs": 1.6060999999999979,
+          "pipelineMs": 1.2408000000000072,
           "planErrors": []
         },
         {
@@ -617,7 +617,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 6500,
-          "pipelineMs": 0.8939000000000021,
+          "pipelineMs": 0.8632000000000062,
           "planErrors": []
         },
         {
@@ -641,7 +641,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 6900,
-          "pipelineMs": 0.6014999999999873,
+          "pipelineMs": 0.556999999999988,
           "planErrors": []
         },
         {
@@ -665,7 +665,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 4750,
-          "pipelineMs": 0.529200000000003,
+          "pipelineMs": 0.5252000000000123,
           "planErrors": []
         },
         {
@@ -689,7 +689,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 8900,
-          "pipelineMs": 0.538800000000009,
+          "pipelineMs": 0.5405000000000086,
           "planErrors": []
         },
         {
@@ -713,7 +713,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 4000,
-          "pipelineMs": 0.9569999999999936,
+          "pipelineMs": 0.9984000000000037,
           "planErrors": [
             "Neither arm can pour into the mug where it is."
           ]
@@ -739,7 +739,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 6500,
-          "pipelineMs": 0.6225000000000023,
+          "pipelineMs": 0.49780000000001223,
           "planErrors": []
         },
         {
@@ -763,7 +763,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 6900,
-          "pipelineMs": 0.5313000000000159,
+          "pipelineMs": 0.4971999999999923,
           "planErrors": []
         },
         {
@@ -787,7 +787,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 7150,
-          "pipelineMs": 0.724899999999991,
+          "pipelineMs": 0.6120000000000232,
           "planErrors": []
         },
         {
@@ -811,14 +811,14 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 8900,
-          "pipelineMs": 0.5188000000000272,
+          "pipelineMs": 0.566299999999984,
           "planErrors": []
         }
       ],
       "successCount": 9,
       "successRate": 0.9,
-      "meanPipelineMs": 0.752400000000003,
-      "p95PipelineMs": 1.6060999999999979,
+      "meanPipelineMs": 0.6898400000000038,
+      "p95PipelineMs": 1.2408000000000072,
       "meanStepCount": 12.2,
       "totalHandoffs": 5
     },
@@ -848,7 +848,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 17850,
-          "pipelineMs": 0.9686999999999841,
+          "pipelineMs": 1.7331000000000074,
           "planErrors": []
         },
         {
@@ -872,7 +872,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 12200,
-          "pipelineMs": 0.6129999999999711,
+          "pipelineMs": 0.8669999999999902,
           "planErrors": []
         },
         {
@@ -896,7 +896,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 9550,
-          "pipelineMs": 0.5060000000000286,
+          "pipelineMs": 0.5269000000000119,
           "planErrors": []
         },
         {
@@ -920,7 +920,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 15700,
-          "pipelineMs": 0.6175999999999817,
+          "pipelineMs": 0.8094000000000392,
           "planErrors": []
         },
         {
@@ -944,7 +944,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 13700,
-          "pipelineMs": 0.5874000000000024,
+          "pipelineMs": 0.6419999999999959,
           "planErrors": []
         },
         {
@@ -968,7 +968,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 14850,
-          "pipelineMs": 0.7293999999999983,
+          "pipelineMs": 0.6759000000000128,
           "planErrors": []
         },
         {
@@ -992,7 +992,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 10050,
-          "pipelineMs": 0.6620999999999526,
+          "pipelineMs": 0.5145999999999731,
           "planErrors": []
         },
         {
@@ -1016,7 +1016,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 9550,
-          "pipelineMs": 0.5545999999999935,
+          "pipelineMs": 0.5230999999999995,
           "planErrors": []
         },
         {
@@ -1040,7 +1040,7 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 14850,
-          "pipelineMs": 1.2069000000000187,
+          "pipelineMs": 0.5914999999999964,
           "planErrors": []
         },
         {
@@ -1064,14 +1064,14 @@
           "plannedParallelism": 2,
           "realisedParallelism": 2,
           "simulatedDurationMs": 8050,
-          "pipelineMs": 0.7417999999999552,
+          "pipelineMs": 0.5952000000000339,
           "planErrors": []
         }
       ],
       "successCount": 10,
       "successRate": 1,
-      "meanPipelineMs": 0.7187499999999887,
-      "p95PipelineMs": 1.2069000000000187,
+      "meanPipelineMs": 0.747870000000006,
+      "p95PipelineMs": 1.7331000000000074,
       "meanStepCount": 23.6,
       "totalHandoffs": 13
     }

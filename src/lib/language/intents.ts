@@ -35,6 +35,7 @@ export type Intent =
   | { kind: "set_table" }
   | { kind: "clear_table" }
   | { kind: "stop" }
+  | { kind: "resume" }
   | { kind: "reset" }
   | { kind: "query_state" };
 
@@ -71,6 +72,8 @@ export function describeIntent(intent: Intent): string {
       return "clear the table";
     case "stop":
       return "stop";
+    case "resume":
+      return "continue";
     case "reset":
       return "reset the scene";
     case "query_state":

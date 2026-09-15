@@ -12,59 +12,59 @@ Seeds       1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
 Set a full place setting  [full-setting]
   "open the top drawer, pick up the plate with arm A, place it on the right setting, then put the fork on the right setting"
-  success 10/10 (100%)   mean 2.10 ms   p95 11.92 ms   steps ~10.8   hand-offs 4
-    seed  1  PASS  steps 14/14  par 2  11.92 ms
-    seed  2  PASS  steps 12/12  par 2  1.76 ms
-    seed  3  PASS  steps 10/10  par 2  0.96 ms
-    seed  4  PASS  steps 12/12  par 2  0.87 ms
-    seed  5  PASS  steps 10/10  par 1  1.61 ms
-    seed  6  PASS  steps 10/10  par 2  1.00 ms
-    seed  7  PASS  steps 10/10  par 2  0.88 ms
-    seed  8  PASS  steps 10/10  par 2  0.62 ms
-    seed  9  PASS  steps 10/10  par 2  0.68 ms
+  success 10/10 (100%)   mean 2.08 ms   p95 11.96 ms   steps ~10.8   hand-offs 4
+    seed  1  PASS  steps 14/14  par 2  11.96 ms
+    seed  2  PASS  steps 12/12  par 2  1.78 ms
+    seed  3  PASS  steps 10/10  par 2  0.94 ms
+    seed  4  PASS  steps 12/12  par 2  1.79 ms
+    seed  5  PASS  steps 10/10  par 1  0.89 ms
+    seed  6  PASS  steps 10/10  par 2  0.77 ms
+    seed  7  PASS  steps 10/10  par 2  0.75 ms
+    seed  8  PASS  steps 10/10  par 2  0.59 ms
+    seed  9  PASS  steps 10/10  par 2  0.72 ms
     seed 10  PASS  steps 10/10  par 1  0.66 ms
 
 Cross-workspace transfer  [handoff-transfer]
   "pick up the mug and place it on the right setting"
-  success 10/10 (100%)   mean 0.57 ms   p95 1.27 ms   steps ~5.2   hand-offs 6
-    seed  1  PASS  steps  4/ 4  par 1  0.72 ms
-    seed  2  PASS  steps  6/ 6  par 1  0.66 ms
-    seed  3  PASS  steps  6/ 6  par 1  0.35 ms
-    seed  4  PASS  steps  4/ 4  par 1  0.35 ms
-    seed  5  PASS  steps  6/ 6  par 1  0.40 ms
-    seed  6  PASS  steps  4/ 4  par 1  0.42 ms
-    seed  7  PASS  steps  6/ 6  par 1  1.27 ms
-    seed  8  PASS  steps  6/ 6  par 1  0.61 ms
-    seed  9  PASS  steps  4/ 4  par 1  0.52 ms
-    seed 10  PASS  steps  6/ 6  par 1  0.42 ms
+  success 10/10 (100%)   mean 0.56 ms   p95 0.90 ms   steps ~5.2   hand-offs 6
+    seed  1  PASS  steps  4/ 4  par 1  0.64 ms
+    seed  2  PASS  steps  6/ 6  par 1  0.90 ms
+    seed  3  PASS  steps  6/ 6  par 1  0.37 ms
+    seed  4  PASS  steps  4/ 4  par 1  0.37 ms
+    seed  5  PASS  steps  6/ 6  par 1  0.82 ms
+    seed  6  PASS  steps  4/ 4  par 1  0.73 ms
+    seed  7  PASS  steps  6/ 6  par 1  0.43 ms
+    seed  8  PASS  steps  6/ 6  par 1  0.44 ms
+    seed  9  PASS  steps  4/ 4  par 1  0.51 ms
+    seed 10  PASS  steps  6/ 6  par 1  0.43 ms
 
 The brief's worked example  [brief-example]
   "open the top drawer, pick up the plate with arm A, place it on the table, pick up the mug with arm B, pour water into the mug with arm A"
-  success 9/10 (90%)   mean 0.67 ms   p95 1.19 ms   steps ~12.2   hand-offs 5
-    seed  1  PASS  steps 13/13  par 2  1.19 ms
-    seed  2  PASS  steps 12/12  par 2  0.80 ms
-    seed  3  PASS  steps 13/13  par 2  0.61 ms
-    seed  4  PASS  steps 11/11  par 2  0.51 ms
-    seed  5  PASS  steps 13/13  par 2  0.50 ms
-    seed  6  FAIL  steps 10/10  par 2  0.52 ms  <- Neither arm can pour into the mug where it is.
-    seed  7  PASS  steps 12/12  par 2  0.93 ms
-    seed  8  PASS  steps 13/13  par 2  0.50 ms
-    seed  9  PASS  steps 12/12  par 2  0.64 ms
-    seed 10  PASS  steps 13/13  par 2  0.49 ms
+  success 9/10 (90%)   mean 0.67 ms   p95 1.23 ms   steps ~12.2   hand-offs 5
+    seed  1  PASS  steps 13/13  par 2  1.23 ms
+    seed  2  PASS  steps 12/12  par 2  0.86 ms
+    seed  3  PASS  steps 13/13  par 2  0.60 ms
+    seed  4  PASS  steps 11/11  par 2  0.53 ms
+    seed  5  PASS  steps 13/13  par 2  0.53 ms
+    seed  6  FAIL  steps 10/10  par 2  0.92 ms  <- Neither arm can pour into the mug where it is.
+    seed  7  PASS  steps 12/12  par 2  0.47 ms
+    seed  8  PASS  steps 13/13  par 2  0.49 ms
+    seed  9  PASS  steps 12/12  par 2  0.63 ms
+    seed 10  PASS  steps 13/13  par 2  0.48 ms
 
 Whole-task macro  [set-the-table]
   "set the dinner table"
-  success 10/10 (100%)   mean 0.67 ms   p95 1.00 ms   steps ~23.6   hand-offs 13
-    seed  1  PASS  steps 27/27  par 2  0.99 ms
-    seed  2  PASS  steps 23/23  par 2  0.61 ms
-    seed  3  PASS  steps 23/23  par 2  0.53 ms
-    seed  4  PASS  steps 27/27  par 2  0.60 ms
+  success 10/10 (100%)   mean 0.70 ms   p95 1.17 ms   steps ~23.6   hand-offs 13
+    seed  1  PASS  steps 27/27  par 2  0.98 ms
+    seed  2  PASS  steps 23/23  par 2  0.63 ms
+    seed  3  PASS  steps 23/23  par 2  0.52 ms
+    seed  4  PASS  steps 27/27  par 2  0.65 ms
     seed  5  PASS  steps 25/25  par 2  0.58 ms
-    seed  6  PASS  steps 23/23  par 2  0.71 ms
-    seed  7  PASS  steps 21/21  par 2  0.57 ms
+    seed  6  PASS  steps 23/23  par 2  0.70 ms
+    seed  7  PASS  steps 21/21  par 2  0.56 ms
     seed  8  PASS  steps 23/23  par 2  0.52 ms
-    seed  9  PASS  steps 23/23  par 2  0.59 ms
-    seed 10  PASS  steps 21/21  par 2  1.00 ms
+    seed  9  PASS  steps 23/23  par 2  0.72 ms
+    seed 10  PASS  steps 21/21  par 2  1.17 ms
 
 ========================================================================
 Overall success rate: 98%  (harness completed in 44 ms)

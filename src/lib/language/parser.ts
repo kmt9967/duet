@@ -192,6 +192,11 @@ function parseClause(
   if (/\b(stop|halt|freeze|abort|cancel|wait)\b/.test(c)) {
     return { intent: { kind: "stop" } };
   }
+  // Checked before the manipulation verbs: "carry on" must not be read as the
+  // "carry" of a pick-and-place.
+  if (/\b(continue|resume|carry on|go on|proceed|keep going|unpause)\b/.test(c)) {
+    return { intent: { kind: "resume" } };
+  }
   if (/\b(reset|start over|restart|clear the plan)\b/.test(c)) {
     return { intent: { kind: "reset" } };
   }

@@ -109,9 +109,10 @@ with the source audio in `evidence/speechmatics/audio/`.
 | "Open the top drawer, pick up the plate with arm A, place it on the table." | 11 | 1 | **1** | `open_drawer, pick, place` | 6 steps |
 | "Stop." | 2 | 1 | **1** | `stop` | 0 steps — control intent, correctly not planned |
 | "Place the fork on the right setting." | 6 | 1 | **1** | `place` | 8 steps, 1 hand-off |
+| "Continue." | 1 | 1 | **1** | `resume` | 0 steps — control intent |
 
-**Transcribed 5/5. Actionable 5/5. One command per sentence 5/5.** First partial
-arrived at 1463–1878 ms.
+**Transcribed 6/6. Actionable 6/6. One command per sentence 6/6.** First partial
+arrived at 1494–1857 ms.
 
 The *Segments* column is the point: "Set the dinner table." arrives as
 `"Set" "the" "dinner" "table."` and is released as a single command. Before the

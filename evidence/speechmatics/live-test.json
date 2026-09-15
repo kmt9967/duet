@@ -11,8 +11,8 @@
     "encoding": "pcm_s16le",
     "sample_rate": 16000
   },
-  "transcribed": 5,
-  "total": 5,
+  "transcribed": 6,
+  "total": 6,
   "results": [
     {
       "file": "01-set-the-table.wav",
@@ -34,8 +34,8 @@
         "Set the dinner table."
       ],
       "transcript": "Set the dinner table.",
-      "firstPartialMs": 1570,
-      "firstFinalMs": 2336,
+      "firstPartialMs": 1607,
+      "firstFinalMs": 2359,
       "intents": [
         "set_table"
       ],
@@ -72,8 +72,8 @@
         "Pick up the mug and place it on the right setting."
       ],
       "transcript": "Pick up the mug and place it on the right setting.",
-      "firstPartialMs": 1463,
-      "firstFinalMs": 2218,
+      "firstPartialMs": 1461,
+      "firstFinalMs": 2208,
       "intents": [
         "pick",
         "place"
@@ -121,8 +121,8 @@
         "Open the top drawer. Pick up the plate with arm. Place it on the table."
       ],
       "transcript": "Open the top drawer. Pick up the plate with arm. Place it on the table.",
-      "firstPartialMs": 1518,
-      "firstFinalMs": 2271,
+      "firstPartialMs": 1591,
+      "firstFinalMs": 2345,
       "intents": [
         "open_drawer",
         "pick",
@@ -150,7 +150,7 @@
       ],
       "transcript": "Stop.",
       "firstPartialMs": 1878,
-      "firstFinalMs": 2728,
+      "firstFinalMs": 2732,
       "intents": [
         "stop"
       ],
@@ -184,14 +184,40 @@
         "Place the fork on the right setting."
       ],
       "transcript": "Place the fork on the right setting.",
-      "firstPartialMs": 1537,
-      "firstFinalMs": 2721,
+      "firstPartialMs": 1545,
+      "firstFinalMs": 2729,
       "intents": [
         "place"
       ],
       "planSteps": 8,
       "handoffs": 1,
       "executedSteps": 8,
+      "planErrors": [],
+      "diagnostics": []
+    },
+    {
+      "file": "06-continue.wav",
+      "partials": [
+        "Continue",
+        "Continue",
+        "Continue"
+      ],
+      "finals": [
+        "Continue."
+      ],
+      "endOfUtteranceCount": 1,
+      "commands": [
+        "Continue."
+      ],
+      "transcript": "Continue.",
+      "firstPartialMs": 1931,
+      "firstFinalMs": 3116,
+      "intents": [
+        "resume"
+      ],
+      "planSteps": 0,
+      "handoffs": 0,
+      "executedSteps": 0,
       "planErrors": [],
       "diagnostics": []
     }

@@ -274,7 +274,12 @@ async function main() {
   }
 
   const transcribed = results.filter((r) => r.transcript.length > 0).length;
-  const actionable = results.filter((r) => r.planSteps > 0 || r.intents.includes("stop")).length;
+  // A control command ("Stop.", "Continue.") is actionable even though it
+  // produces no robot steps — it acts on the session, not the arms.
+  const CONTROL = ["stop", "resume", "reset", "query_state"];
+  const actionable = results.filter(
+    (r) => r.planSteps > 0 || r.intents.some((i) => CONTROL.includes(i)),
+  ).length;
   const oneCommandEach = results.filter((r) => r.commands.length === 1).length;
 
   console.log("\n" + "=".repeat(76));

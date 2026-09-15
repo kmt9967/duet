@@ -132,14 +132,23 @@ export function useSession(initialSeed = 1) {
         setIsPlaying(false);
         return "Stopped.";
       }
+      if (parsed.intents.some((i) => i.kind === "resume")) {
+        // Only meaningful when a plan exists and has not finished.
+        if (!playback || playheadMs >= playback.totalMs) {
+          return "There is nothing to continue.";
+        }
+        setIsPlaying(true);
+        return "Continuing.";
+      }
 
       // Plan against the scene as it stands after the last executed plan, so a
       // sequence of spoken commands composes the way an operator expects.
       const base = execution?.scene ?? scene;
+      // Control intents act on the session, not the arms, so they must never
+      // reach the planner.
+      const CONTROL = new Set(["stop", "resume", "reset", "query_state"]);
       const nextPlan = planIntents(
-        parsed.intents.filter(
-          (i) => i.kind !== "stop" && i.kind !== "reset" && i.kind !== "query_state",
-        ),
+        parsed.intents.filter((i) => !CONTROL.has(i.kind)),
         base,
       );
       const reasoningMs = performance.now() - startedAt;
@@ -187,7 +196,7 @@ export function useSession(initialSeed = 1) {
 
       return buildAcknowledgement(record, result);
     },
-    [execution, scene, seed, loadSeed],
+    [execution, scene, seed, loadSeed, playback, playheadMs],
   );
 
   const state: SessionState = {

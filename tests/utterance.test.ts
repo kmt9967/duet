@@ -199,6 +199,32 @@ describe("control commands and sequential utterances", () => {
     assert.equal(parseCommand(text).intents[0]?.kind, "stop");
   });
 
+  test("'Continue.' arrives as segments and resolves to resume", () => {
+    // Live transcripts split even short words from their punctuation.
+    const agg = new UtteranceAggregator();
+    agg.addFinalSegment("Continue", 0);
+    agg.addFinalSegment(".", 0);
+    const text = agg.complete();
+    assert.equal(text, "Continue.");
+    assert.equal(parseCommand(text!).intents[0]?.kind, "resume");
+  });
+
+  test("resume synonyms all map to the same control intent", () => {
+    for (const phrase of ["continue", "resume", "carry on", "go on", "keep going"]) {
+      assert.equal(
+        parseCommand(phrase).intents[0]?.kind,
+        "resume",
+        `"${phrase}" did not resolve to resume`,
+      );
+    }
+  });
+
+  test("'carry on' is not mistaken for a carry-and-place", () => {
+    const parsed = parseCommand("carry on");
+    assert.equal(parsed.intents.length, 1);
+    assert.equal(parsed.intents[0]?.kind, "resume");
+  });
+
   test("three sentences in a row produce three distinct commands", () => {
     const agg = new UtteranceAggregator();
     const spoken = [LIVE.setTheTable, LIVE.stop, LIVE.crossTransfer];
