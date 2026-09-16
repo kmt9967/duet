@@ -297,9 +297,11 @@ Physical AI, Robotics, Voice, Developer Tools
 | Public GitHub repository | `https://github.com/kmt9967/duet` |
 | Application URL | `https://duet-alpha-ebon.vercel.app` |
 | Demo application platform | Vercel |
-| Video presentation | `<PASTE YOUTUBE URL>` |
-| Slide presentation | `<PASTE SLIDES PDF/LINK>` |
-| Cover image | `evidence/final-ui/00-cover.png` |
+| Video presentation | `https://youtu.be/zi3mNkrSNaw` |
+| Slide presentation | `https://github.com/kmt9967/duet/blob/main/submission/DUET-AI-Infra-Summit.pdf` |
+| Cover image | `evidence/final-ui/00-cover.png` (upload the file itself) |
+
+All four links verified reachable without a login on 2026-09-16.
 
 ---
 
