@@ -1,0 +1,75 @@
+DUET — Dual-arm Execution from Everyday Talk — turns natural voice commands into coordinated two-arm robot actions.
+
+Built for the AI Infra Summit Hackathon, DUET combines Speechmatics real-time speech recognition, multimodal reasoning, deterministic bimanual task planning, hand-offs, parallel execution and reproducible simulation.
+
+Say "Set the dinner table." and DUET plans 27 coordinated steps across two simulated SO-101 arms — including 3 hand-offs the arms cannot avoid — and executes them with 2x parallelism.
+
+▬▬▬ ABOUT DUET ▬▬▬
+
+Three things make this harder than it sounds:
+
+• PRECONDITIONS — the cutlery starts inside a closed drawer, so it must be opened first, exactly once, however many later steps depend on it. Nothing instructs the planner to do this; it falls out of the dependency graph.
+
+• HAND-OFFS THAT ARE FORCED, NOT SCRIPTED — each place setting sits inside exactly one arm's reach envelope, so moving an object across the table is impossible for a single arm. When the holding arm cannot reach the destination and the other can, the planner inserts a give/take transfer. None of it is special-cased.
+
+• ROBUSTNESS — placement, mass, friction, shape and lighting are randomized per seed. Grasps can genuinely fail, and failures propagate rather than being ignored.
+
+▬▬▬ HOW IT WORKS ▬▬▬
+
+speech → Speechmatics real-time → transcript segments → complete utterance → parser → deterministic planner → dependency graph → executor
+
+The planner is deterministic and no language model sits in the action path. A model may explain a plan; it never chooses one. The same sentence against the same seed produces a byte-identical plan, and the tests enforce it. Reachability is decided by solving inverse kinematics, with scene generator, planner and executor all calling the same solver.
+
+▬▬▬ LIVE DEMO ▬▬▬
+
+No install, no sign-up, no microphone needed — press a preset and watch:
+https://duet-alpha-ebon.vercel.app
+
+▬▬▬ SPEECHMATICS ▬▬▬
+
+Speechmatics is the operator interface for a physical task. Because the transcript gates a robot action:
+
+• Partial transcripts drive the live caption only. A half-heard phrase never moves an arm.
+• Speechmatics commits transcripts incrementally, so "Set the dinner table." arrives as several segments. DUET buffers them and releases one command at the end-of-utterance boundary. One spoken sentence = exactly one command.
+• The parser is built for real speech, not clean prose: missing punctuation, fillers and homophones are handled.
+• The API key never reaches the browser. A server route mints a short-lived token, rate-limited to protect free-tier credits.
+
+Verified live: 6 of 6 test utterances transcribed, each producing exactly one command.
+
+▬▬▬ TECHNICAL RESULTS ▬▬▬
+
+• "Set the dinner table." → 27-step plan, 3 hand-offs, 2x parallelism, executed
+• 98% success across 40 seeded evaluation runs in DUET's deterministic simulator (39/40)
+• 53/53 automated tests passing
+• Scoring is strict: the command must plan with no errors, every step must execute, AND the world must end in the requested state
+• The one failing seed is kept deliberately — tuning it away would make the number meaningless
+
+▬▬▬ TECH STACK ▬▬▬
+
+TypeScript · Next.js · React · Tailwind CSS · Canvas 2D · Speechmatics Real-Time SDK · Vercel
+
+Closed-form 5-DOF SO-101 inverse kinematics with real joint limits, seeded randomization, a Coulomb-friction grasp model and a dependency-graph planner. No Python, no Docker, no model download. Built and deployed entirely on free tiers at $0 cost.
+
+▬▬▬ LINKS ▬▬▬
+
+Live demo: https://duet-alpha-ebon.vercel.app
+Source code: https://github.com/kmt9967/duet
+Hackathon: https://lablab.ai/event/ai-infra-summit-hackathon
+
+▬▬▬ HACKATHON ▬▬▬
+
+AI Infra Summit Hackathon 2026 (Kisaco Research + lablab.ai).
+Track: Bimanual VLA Manipulation with Multi-Modal Reasoning
+Bonus: Best Use of Speechmatics
+
+▬▬▬ SCOPE AND DISCLAIMER ▬▬▬
+
+• Everything runs in a purpose-built deterministic simulator. No physical robot is involved or claimed.
+• The 98% figure describes 40 seeded evaluation runs inside that simulator — not real-world robot accuracy.
+• This is not MuJoCo. Contact dynamics and collision between bodies are not modelled.
+• Task reasoning is symbolic. There is no learned VLA policy, and perception reads scene state rather than pixels.
+• No OpenVINO acceleration or Intel Core Ultra execution is claimed or demonstrated. That work was outside the available remote hardware environment, so DUET focuses instead on multimodal reasoning, real-time voice interaction, bimanual planning, robustness and reproducibility.
+
+What is real: the kinematics, joint limits, reach envelopes, hand-off logic, grasp model, randomization, concurrency, scoring criteria, and every number quoted here.
+
+#AI #Robotics #Speechmatics #PhysicalAI #Hackathon #VoiceAI

@@ -4,9 +4,11 @@
 
 Built for the **AI Infra Summit Hackathon 2026** — Intel's online *Bimanual VLA Manipulation with Multi-Modal Reasoning* challenge, with **Speechmatics** real-time transcription as the operator interface.
 
-### ▶ [Live demo — duet-alpha-ebon.vercel.app](https://duet-alpha-ebon.vercel.app)
+### ▶ [Live demo — duet-alpha-ebon.vercel.app](https://duet-alpha-ebon.vercel.app) &nbsp;·&nbsp; 🎬 [Watch the demo (2:31)](https://youtu.be/zi3mNkrSNaw)
 
 No install, no sign-up, no microphone required. Press a preset and watch two arms plan and execute.
+
+![DUET command centre mid-execution — 27 steps, 3 hand-offs, 2x parallelism](evidence/final-ui/04-bimanual-execution.png)
 
 ```bash
 git clone https://github.com/kmt9967/duet && cd duet
@@ -161,12 +163,24 @@ TypeScript · Next.js 16 · React 19 · Tailwind CSS 4 · Canvas 2D · Speechmat
 
 No Python, no Docker, no build-time model download. `npm install && npm run dev` is the whole setup.
 
+## Screenshots
+
+All captured from production. More in [`evidence/final-ui/`](evidence/final-ui/).
+
+| | |
+|---|---|
+| **One sentence, one command** — the command log after `set the dinner table`: 27 steps, +3 hand-offs, EXECUTED ![](evidence/final-ui/03-one-command.png) | |
+| **Hand-off in progress** — both arms converging on the shared zone ![](evidence/final-ui/05-hand-off.png) | |
+| **Dependency phases** — steps on one row run concurrently ![](evidence/final-ui/06-task-plan.png) | |
+
 ## Links
 
 | | |
 |---|---|
 | Live demo | <https://duet-alpha-ebon.vercel.app> |
+| Demo video | <https://youtu.be/zi3mNkrSNaw> |
 | Repository | <https://github.com/kmt9967/duet> |
+| Slide deck | [`submission/DUET-AI-Infra-Summit.pdf`](submission/DUET-AI-Infra-Summit.pdf) |
 | Track | Intel — Bimanual VLA Manipulation with Multi-Modal Reasoning (online) |
 | Bonus | Best Use of Speechmatics |
 
